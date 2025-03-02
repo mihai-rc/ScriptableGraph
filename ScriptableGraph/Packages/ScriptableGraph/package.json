@@ -4,12 +4,12 @@
   "displayName": "Scriptable Graph",
   "description": "Graph data structure that maintains script nodes and serializes them into Unity Scenes.",
   "unity": "2022.3",
+  "unityRelease": "58f1",
   "changelogUrl": "https://github.com/mihai-rc/ScriptableGraph/blob/main/ScriptableGraph/Packages/ScriptableGraph/CHANGELOG.md",
   "licensesUrl": "https://github.com/mihai-rc/ScriptableGraph/blob/main/ScriptableGraph/Packages/ScriptableGraph/LICENSE.md",
   "author": {
     "name": "Robert-Mihai Craciun",
     "email": "mihai.rcraciun@gmail.com",
     "url": "https://github.com/mihai-rc"
-  },
-  "unityRelease": "58f1"
+  }
 }
