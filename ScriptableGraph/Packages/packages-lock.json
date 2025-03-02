@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.gift-horse.scriptable-graph": {
-      "version": "file:GiftHorse.ScriptableGraph",
+      "version": "file:ScriptableGraph",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
