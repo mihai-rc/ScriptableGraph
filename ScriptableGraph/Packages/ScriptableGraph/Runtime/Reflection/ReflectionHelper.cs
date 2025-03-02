@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using GiftHorse.ScriptableGraphs.Attributes;
 using UnityEngine;
+using GiftHorse.ScriptableGraphs.Attributes;
 
 #if UNITY_EDITOR
 using UnityEditor;
