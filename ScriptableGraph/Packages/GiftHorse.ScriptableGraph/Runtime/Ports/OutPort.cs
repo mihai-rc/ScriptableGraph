@@ -1,0 +1,38 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+namespace GiftHorse.ScriptableGraphs
+{
+    /// <summary>
+    /// Data about an output port.
+    /// </summary>
+    [Serializable]
+    public class OutPort : PortBase
+    {
+        [SerializeField]
+        private List<string> m_ConnectionIds;
+
+        /// <summary>
+        /// List of connections ids this port is linked to.
+        /// </summary>
+        public List<string> ConnectionIds => m_ConnectionIds;
+        
+        /// <inheritdoc />
+        public override bool IsConnected => !m_ConnectionIds.Any();
+        
+        /// <summary>
+        /// <see cref="OutPort"/> constructor.
+        /// </summary>
+        /// <param name="name"> The name of the port. </param>
+        /// <param name="nodeId"> The id of the node this port belongs to. </param>
+        /// <param name="index"> The index of the port in node's output ports list. </param>
+        /// <param name="compatibleType"> The assembly qualified name of the type this port is compatible with. </param>
+        public OutPort(string name, string nodeId, int index, string compatibleType) 
+            : base(name, nodeId, index, compatibleType)
+        {
+            m_ConnectionIds = new List<string>();
+        }
+    }
+}

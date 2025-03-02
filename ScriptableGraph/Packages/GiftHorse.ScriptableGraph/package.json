@@ -1,0 +1,15 @@
+{
+  "name": "com.gift-horse.scriptable-graph",
+  "version": "0.0.1",
+  "displayName": "Scriptable Graph",
+  "description": "Graph data structure that maintains script nodes and serializes them into Unity Scenes.",
+  "unity": "2022.3",
+  "changelogUrl": "https://example.com/changelog.html",
+  "licensesUrl": "https://github.com/mihai-rc/ScriptableGraph/blob/main/LICENSE",
+  "author": {
+    "name": "Robert-Mihai Craciun",
+    "email": "mihai.rcraciun@gmail.com",
+    "url": "https://github.com/mihai-rc"
+  },
+  "unityRelease": "58f1"
+}

@@ -1,0 +1,82 @@
+ScriptableGraphView 
+{
+    flex-grow: 1;
+}
+
+.node
+{
+    display: flex;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#contents
+{
+    min-width: 120px;
+}
+
+#PropertiesHolder 
+{
+    background-color: rgb(56, 56, 56);
+    flex-basis: auto;
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    flex-direction: column;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+#PropertyField
+{
+    display: flex;
+    flex-basis: auto;
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+#input
+{
+    min-width: 86px;
+}
+
+#output
+{
+    min-width: 86px;
+}
+
+.unity-property-field__label 
+{
+    min-width: 86px;
+}
+
+.unity-base-field__input
+{
+    width: 102px;
+}
+
+.unity-vector2-field .unity-composite-field__field-spacer
+{
+    display: none;
+}
+
+.unity-vector2-field #unity-y-input
+{
+    margin-right: 0;
+}
+
+.unity-vector3-field 
+{
+    width: 289px;
+}
+
+.unity-collection-view
+{
+    margin-left: 3px;
+    margin-right: 3px;
+}
