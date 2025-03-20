@@ -10,7 +10,7 @@ namespace Calculator
 
         protected override void OnProcess()
         {
-            Logger.AddLog($"Node: {Id}, has Dependency Level: {DepthLevel}. PRINT: {Value}");
+            Logger.AddLog($"Node: {Id}, has Depth Level: {DepthLevel}. PRINT: {Value}");
             Logger.ShowLog();
         }
     }

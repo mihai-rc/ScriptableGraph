@@ -14,7 +14,7 @@ namespace Calculator
         protected override void OnProcess()
         {
             Value = First + Second;
-            Logger.AddLog($"Node: {Id}, has Dependency Level: {DepthLevel} and Outputs value: {Value}");
+            Logger.AddLog($"Node: {Id}, has Depth Level: {DepthLevel} and Outputs value: {Value}");
         }
     }
 }

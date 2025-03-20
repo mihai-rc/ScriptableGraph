@@ -10,18 +10,20 @@ namespace GiftHorse.ScriptableGraphs
     [DisallowMultipleComponent]
     public abstract class ScriptableGraph : MonoBehaviour
     {
-        protected const string k_SceneNotLoaded = "[ScriptableGraph] The graph: {0} cannot be interacted with when its parent scene: {1} is not loaded!";
+        private const string k_SceneNotLoaded = "[ScriptableGraph] The graph: {0} cannot be interacted with when its parent scene: {1} is not loaded!";
         private const string k_PortsAlreadyConnected = "[ScriptableGraph] Trying to connect two ports that are already connected! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
         private const string k_PortsNotConnected = "[ScriptableGraph] Trying to disconnect two ports that are not connected! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
         private const string k_PortsTypeMismatch = "[ScriptableGraph] Trying to connect two ports that are not the same type! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
         private const string k_PortsOfTheSameNode = "[ScriptableGraph] Trying to connect two ports that belong to the same node! Graph name: {0}, From Port Index: {1} To Port Index: {2}";
         private const string k_ConnectionNotFound = "[ScriptableGraph] No connection found for Id: {0}! Graph name: {1}.";
+        private const string k_NodeNotFound = "[ScriptableGraph] Node not found! Graph owner: {0}, Node Id: {1}";
 
         [SerializeReference] private List<ScriptableNode> m_Nodes;
         [SerializeReference] private List<Connection> m_Connections;
 
         private Dictionary<string, ScriptableNode> m_NodesById;
         private Dictionary<string, Connection> m_ConnectionsById;
+        private readonly HashSet<string> m_VisitedNodes = new();
 
         /// <summary>
         /// The Assembly Qualified Name of <see cref="ScriptableNode"/>'s specialized type.
@@ -37,11 +39,16 @@ namespace GiftHorse.ScriptableGraphs
         /// List of all connections.
         /// </summary>
         public List<Connection> Connections => m_Connections;
+        
+        /// <summary>
+        /// Returns whether the scene this graph is serialized into is loaded.
+        /// </summary>
+        private bool IsSceneLoaded => gameObject.scene.isLoaded;
 
         /// <summary>
         /// Dictionary of all <see cref="ScriptableNode"/>s stored by their ids.
         /// </summary>
-        protected Dictionary<string, ScriptableNode> NodesById
+        private Dictionary<string, ScriptableNode> NodesById
         {
             get
             {
@@ -55,7 +62,7 @@ namespace GiftHorse.ScriptableGraphs
         /// <summary>
         /// Dictionary of all <see cref="Connection"/>s stored by their ids.
         /// </summary>
-        protected Dictionary<string, Connection> ConnectionsById
+        private Dictionary<string, Connection> ConnectionsById
         {
             get
             {
@@ -65,11 +72,6 @@ namespace GiftHorse.ScriptableGraphs
                 return m_ConnectionsById;
             }
         }
-
-        /// <summary>
-        /// Returns whether the scene this graph is serialized into is loaded.
-        /// </summary>
-        protected bool IsSceneLoaded => gameObject.scene.isLoaded;
 
         protected ScriptableGraph()
         {
@@ -167,6 +169,8 @@ namespace GiftHorse.ScriptableGraphs
             if (!TryConnectPorts(fromPort, toPort, out var connection)) 
                 return;
 
+            UpdateDependencyLevels(toNode);
+            SortNodesByDepthLevel();
             OnConnectionCreated(fromNode, fromPort, toNode, toPort);
         }
 
@@ -194,7 +198,18 @@ namespace GiftHorse.ScriptableGraphs
             if (!TryDisconnectPorts(fromPort, toPort))
                 return;
 
+            UpdateDependencyLevels(toNode);
+            SortNodesByDepthLevel();
             OnConnectionRemoved(fromNode, fromPort, toNode, toPort);
+        }
+        
+        /// <summary>
+        /// Executes all nodes processes.
+        /// </summary>
+        public void Process()
+        {
+            foreach (var node in m_Nodes)
+                node.Process(ConnectionsById);
         }
 
         /// <summary>
@@ -204,6 +219,30 @@ namespace GiftHorse.ScriptableGraphs
         {
             m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n);
             m_ConnectionsById = m_Connections.ToDictionary(c => c.Id, c => c);
+        }
+        
+        /// <summary>
+        /// Tries to get a node by its id.
+        /// </summary>
+        /// <param name="nodeId"> The id of the node. </param>
+        /// <param name="node"> The reference to the corresponding node. Is null if the id was not found. </param>
+        /// <returns> Returns true if the node was found, otherwise returns false. </returns>
+        private bool TryGetNodeById(string nodeId, out ScriptableNode node)
+        {
+            node = null;
+            if (!IsSceneLoaded)
+            {
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                return false;
+            }
+
+            if (NodesById.TryGetValue(nodeId, out node))
+            {
+                return true;
+            }
+
+            Debug.LogErrorFormat(k_NodeNotFound, name, nodeId);
+            return false;
         }
 
         private bool TryConnectPorts(OutPort from, InPort to, out Connection connection)
@@ -263,6 +302,77 @@ namespace GiftHorse.ScriptableGraphs
             ConnectionsById.Remove(connection.Id);
 
             return true;
+        }
+        
+        private void UpdateDependencyLevels(ScriptableNode node)
+        {
+            if (!m_VisitedNodes.Any())
+                m_VisitedNodes.Clear();
+
+            UpdateDependencyLevelsRecursively(node);
+            m_VisitedNodes.Clear();
+        }
+
+        private void UpdateDependencyLevelsRecursively(ScriptableNode node)
+        {
+            if (m_VisitedNodes.Contains(node.Id))
+                return;
+
+            // By traversing the subgraph of the inputs without accounting for the nodes that are connected in a circle
+            // will result in the dependency level of those nodes to be evaluated as the inputs of the first visited node
+            // of the circle, which can lead to some unexpected behavior.
+            
+            int? maxDependencyLevel = null;
+            foreach (var inPort in node.InPorts)
+            {
+                if (inPort.ConnectionId is null)
+                    continue;
+
+                if (!ConnectionsById.TryGetValue(inPort.ConnectionId, out var connection))
+                    continue;
+
+                if (!TryGetNodeById(connection.FromPort.NodeId, out var inNode))
+                    continue;
+
+                if (maxDependencyLevel is null || inNode.DepthLevel > maxDependencyLevel.Value)
+                    maxDependencyLevel = inNode.DepthLevel;
+            }
+
+            node.DepthLevel = maxDependencyLevel is not null 
+                ? maxDependencyLevel.Value + 1
+                : 0;
+
+            m_VisitedNodes.Add(node.Id);
+            foreach (var outPort in node.OutPorts)
+            {
+                foreach (var connectionId in outPort.ConnectionIds)
+                {
+                    if (!ConnectionsById.TryGetValue(connectionId, out var connection))
+                    {
+                        Debug.LogErrorFormat(k_ConnectionNotFound, name, connectionId);
+                        continue;
+                    }
+
+                    if (!TryGetNodeById(connection.ToPort.NodeId, out var outNode))
+                        continue;
+
+                    UpdateDependencyLevelsRecursively(outNode);
+                }
+            }
+        }
+
+        private void SortNodesByDepthLevel()
+        {
+            ScriptableNodes.Sort((left, right) =>
+            {
+                if (left.DepthLevel < right.DepthLevel) 
+                    return -1;
+                
+                if (left.DepthLevel > right.DepthLevel) 
+                    return  1;
+                
+                return 0;
+            });
         }
     }
 }
