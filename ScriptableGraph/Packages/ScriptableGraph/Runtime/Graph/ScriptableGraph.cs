@@ -227,7 +227,7 @@ namespace GiftHorse.ScriptableGraphs
         /// <param name="nodeId"> The id of the node. </param>
         /// <param name="node"> The reference to the corresponding node. Is null if the id was not found. </param>
         /// <returns> Returns true if the node was found, otherwise returns false. </returns>
-        private bool TryGetNodeById(string nodeId, out ScriptableNode node)
+        protected bool TryGetNodeById(string nodeId, out ScriptableNode node)
         {
             node = null;
             if (!IsSceneLoaded)

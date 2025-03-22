@@ -17,7 +17,19 @@ namespace GiftHorse.ScriptableGraphs
         private const BindingFlags k_BindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         private const string k_NotSubTypeOfScriptableNode = "[ScriptableGraph] Cannot process type: {0} because it is not a subtype of ScriptableNode!";
         private const string k_NodePathNotSpecified = "[ScriptableGraph] Cannot add node of type: {0} to serach window because it does not specify the path in the search tree!";
+        
+        public static bool IsNodeExcludeFromSearch(Type nodeType)
+        {
+            if (!IsSubclassOfNode(nodeType))
+            {
+                Debug.LogErrorFormat(k_NotSubTypeOfScriptableNode, nodeType.FullName);
+                return false;
+            }
 
+            var nodeScriptAttribute = nodeType.GetCustomAttribute<NodeScriptAttribute>();
+            return nodeScriptAttribute?.ExcludeFromSearch ?? false;
+        }
+        
         public static string GetNodeTitleByType(Type nodeType)
         {
             if (!IsSubclassOfNode(nodeType))

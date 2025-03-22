@@ -27,10 +27,14 @@ namespace GiftHorse.ScriptableGraphs.Editor
         public List<Port> InPorts { get; } = new();
         public List<Port> OutPorts { get; } = new();
 
-        public ScriptableNodeView(ScriptableNode scriptableNode, ScriptableGraphEditorContext context)
+        public ScriptableNodeView(ScriptableNode scriptableNode, ScriptableGraphEditorContext context, bool isDeletable)
         {
             m_ScriptableNode = scriptableNode;
             m_Context = context;
+            
+            // Remove the delete capability
+            if (!isDeletable)
+                capabilities &= ~Capabilities.Deletable;
             
             CreateInputs();
             CreateOutputs();
