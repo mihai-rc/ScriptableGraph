@@ -194,8 +194,8 @@ namespace GiftHorse.ScriptableGraphs.Editor
 
         private void AddNodeToGraph(ScriptableNode scriptableNode)
         {
-            var isDeletableNode = ReflectionHelper.IsNodeExcludeFromSearch(scriptableNode.GetType());
-            var nodeView = new ScriptableNodeView(scriptableNode, m_Context, isDeletableNode);
+            var isSearchableNode = ReflectionHelper.IsNodeExcludedFromSearch(scriptableNode.GetType());
+            var nodeView = new ScriptableNodeView(scriptableNode, m_Context, !isSearchableNode);
             nodeView.SetPosition(scriptableNode.Position);
 
             m_NodeViews.Add(nodeView);

@@ -18,7 +18,7 @@ namespace GiftHorse.ScriptableGraphs
         private const string k_NotSubTypeOfScriptableNode = "[ScriptableGraph] Cannot process type: {0} because it is not a subtype of ScriptableNode!";
         private const string k_NodePathNotSpecified = "[ScriptableGraph] Cannot add node of type: {0} to serach window because it does not specify the path in the search tree!";
         
-        public static bool IsNodeExcludeFromSearch(Type nodeType)
+        public static bool IsNodeExcludedFromSearch(Type nodeType)
         {
             if (!IsSubclassOfNode(nodeType))
             {
