@@ -15,8 +15,8 @@ namespace GiftHorse.ScriptableGraphs
         private const string k_PortsNotConnected = "[ScriptableGraph] Trying to disconnect two ports that are not connected! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
         private const string k_PortsTypeMismatch = "[ScriptableGraph] Trying to connect two ports that are not the same type! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
         private const string k_PortsOfTheSameNode = "[ScriptableGraph] Trying to connect two ports that belong to the same node! Graph name: {0}, From Port Index: {1} To Port Index: {2}";
-        private const string k_ConnectionNotFound = "[ScriptableGraph] No connection found for Id: {0}! Graph name: {1}.";
-        private const string k_NodeNotFound = "[ScriptableGraph] Node not found! Graph owner: {0}, Node Id: {1}";
+        private const string k_NodeNotFound = "[ScriptableGraph] No node was found with Id: {0}! Graph name: {1}.";
+        private const string k_ConnectionNotFound = "[ScriptableGraph] No connection was found for Id: {0}! Graph name: {1}.";
 
         [SerializeReference] private List<ScriptableNode> m_Nodes;
         [SerializeReference] private List<Connection> m_Connections;
@@ -82,7 +82,7 @@ namespace GiftHorse.ScriptableGraphs
         private void Start()
         {
             foreach (var node in ScriptableNodes)
-                node.Init(name);
+                node.Init(this);
 
             foreach (var connection in m_Connections)
                 connection.Init(NodesById);
@@ -209,7 +209,7 @@ namespace GiftHorse.ScriptableGraphs
         public void Process()
         {
             foreach (var node in m_Nodes)
-                node.Process(ConnectionsById);
+                node.Process(this);
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace GiftHorse.ScriptableGraphs
         /// <param name="nodeId"> The id of the node. </param>
         /// <param name="node"> The reference to the corresponding node. Is null if the id was not found. </param>
         /// <returns> Returns true if the node was found, otherwise returns false. </returns>
-        protected bool TryGetNodeById(string nodeId, out ScriptableNode node)
+        public bool TryGetNodeById(string nodeId, out ScriptableNode node)
         {
             node = null;
             if (!IsSceneLoaded)
@@ -241,7 +241,31 @@ namespace GiftHorse.ScriptableGraphs
                 return true;
             }
 
-            Debug.LogErrorFormat(k_NodeNotFound, name, nodeId);
+            Debug.LogErrorFormat(k_NodeNotFound, nodeId, name);
+            return false;
+        }
+        
+        /// <summary>
+        /// Tries to get a connection by its id.
+        /// </summary>
+        /// <param name="connectionId"> The id of the connection. </param>
+        /// <param name="connection"> The reference to the corresponding connection. Is null if the id was not found. </param>
+        /// <returns> Returns true if the connection was found, otherwise returns false. </returns>
+        public bool TryGetConnectionById(string connectionId, out Connection connection)
+        {
+            connection = null;
+            if (!IsSceneLoaded)
+            {
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                return false;
+            }
+
+            if (ConnectionsById.TryGetValue(connectionId, out connection))
+            {
+                return true;
+            }
+            
+            Debug.LogErrorFormat(k_ConnectionNotFound, connectionId, name);
             return false;
         }
 
@@ -289,9 +313,8 @@ namespace GiftHorse.ScriptableGraphs
                 return false;
             }
 
-            if (!ConnectionsById.TryGetValue(to.ConnectionId, out var connection))
+            if (!TryGetConnectionById(to.ConnectionId, out var connection))
             {
-                Debug.LogErrorFormat(k_ConnectionNotFound, to.ConnectionId, name);
                 return false;
             }
 
@@ -328,7 +351,7 @@ namespace GiftHorse.ScriptableGraphs
                 if (inPort.ConnectionId is null)
                     continue;
 
-                if (!ConnectionsById.TryGetValue(inPort.ConnectionId, out var connection))
+                if (!TryGetConnectionById(inPort.ConnectionId, out var connection))
                     continue;
 
                 if (!TryGetNodeById(connection.FromPort.NodeId, out var inNode))
@@ -347,9 +370,8 @@ namespace GiftHorse.ScriptableGraphs
             {
                 foreach (var connectionId in outPort.ConnectionIds)
                 {
-                    if (!ConnectionsById.TryGetValue(connectionId, out var connection))
+                    if (!TryGetConnectionById(connectionId, out var connection))
                     {
-                        Debug.LogErrorFormat(k_ConnectionNotFound, name, connectionId);
                         continue;
                     }
 

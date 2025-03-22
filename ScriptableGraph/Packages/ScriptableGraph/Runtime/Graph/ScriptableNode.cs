@@ -98,26 +98,28 @@ namespace GiftHorse.ScriptableGraphs
         /// <summary>
         /// Node's initialization. It is called only once, when the graph is initialized.
         /// </summary>
-        protected virtual void OnCreate() { }
+        /// <param name="graph"> The <see cref="ScriptableGraph"/> the owns this node. </param>
+        protected virtual void OnCreate(ScriptableGraph graph) { }
 
         /// <summary>
         /// Node's process implementation.
         /// </summary>
-        protected abstract void OnProcess();
+        /// <param name="graph"> The <see cref="ScriptableGraph"/> the owns this node. </param>
+        protected abstract void OnProcess(ScriptableGraph graph);
 
         /// <summary>
         /// Initializes ports values and binds all references.
         /// </summary>
-        /// <param name="graphName"> The name of the <see cref="GameObject"/> the graph is attached to. </param>
-        public void Init(string graphName)
+        /// <param name="graph"> The <see cref="ScriptableGraph"/> the owns this node. </param>
+        public void Init(ScriptableGraph graph)
         {
             if (m_Initialized)
                 return;
 
-            m_GraphName = graphName;
+            m_GraphName = graph.name;
             m_Initialized = true;
 
-            OnCreate();
+            OnCreate(graph);
         }
 
         /// <summary>
@@ -163,18 +165,18 @@ namespace GiftHorse.ScriptableGraphs
         /// <summary>
         /// Processes the node.
         /// </summary>
-        /// <param name="connectionsById"> Dictionary of connections stored by their ids. </param>
-        public void Process(Dictionary<string, Connection> connectionsById)
+        /// <param name="graph"> The <see cref="ScriptableGraph"/> the owns this node. </param>
+        public void Process(ScriptableGraph graph)
         {
             foreach (var inPort in InPorts)
             {
-                if (connectionsById.TryGetValue(inPort.ConnectionId, out var connection))
+                if (graph.TryGetConnectionById(inPort.ConnectionId, out var connection))
                 {
                     connection.TransferValue();
                 }
             }
             
-            OnProcess();
+            OnProcess(graph);
         }
     }
 }
