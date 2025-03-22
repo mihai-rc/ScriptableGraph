@@ -26,10 +26,7 @@ namespace GiftHorse.ScriptableGraphs
                 return null;
             }
 
-            var titleWithoutSuffix = Regex.Replace(nodeType.Name, "Node$", "");
-            var titleWithSpaces = Regex.Replace(titleWithoutSuffix, "([a-z])([A-Z])", "$1 $2");;
-
-            return titleWithSpaces;
+            return BeautifyTitle(nodeType.Name);
         }
 
         public static void GetNodePorts(ScriptableNode node, out List<InPort> inPorts, out List<OutPort> outPorts)
@@ -63,10 +60,10 @@ namespace GiftHorse.ScriptableGraphs
         }
 
         private static InPort CreateInPort(FieldInfo fieldInfo, string nodeId, int index) => 
-            new(fieldInfo.Name, nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
+            new(BeautifyTitle(fieldInfo.Name), nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
 
         private static OutPort CreateOutPort(FieldInfo fieldInfo, string nodeId, int index) => 
-            new(fieldInfo.Name, nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
+            new(BeautifyTitle(fieldInfo.Name), nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
 
 #if UNITY_EDITOR
         public static List<(Type type, string title, string[] path)> GetNodeSearchEntries(ScriptableGraph graph)
@@ -81,7 +78,7 @@ namespace GiftHorse.ScriptableGraphs
             return TypeCache
                 .GetTypesDerivedFrom(nodeBaseType)
                 .Select(t => (Type: t, NodePath: t.GetCustomAttribute<NodeScriptAttribute>()))
-                .Where(HasNodePathAttribute)
+                .Where(tmd => HasNodeScriptAttribute(tmd) && IsNotExcludedNode(tmd))
                 .Select(tp => (tp.Type, GetNodeTitleByType(tp.Type), tp.NodePath?.SearchPath?.Split('/')))
                 .ToList();
         }
@@ -117,18 +114,31 @@ namespace GiftHorse.ScriptableGraphs
             return type
                 .GetFields(k_BindingFlags)
                 .ToList()
-                .Where(fieldInfo => IsSubclassOfNode(type) &&
-                    fieldInfo.GetCustomAttribute<NodeFieldAttribute>() is not null)
+                .Where(fieldInfo => IsSubclassOfNode(type) && fieldInfo
+                .GetCustomAttribute<NodeFieldAttribute>() is not null)
                 .Select(fieldInfo => fieldInfo.Name);
         }
 
-        private static bool HasNodePathAttribute((Type nodeType, NodeScriptAttribute attribute) nodeMetadata)
+        private static bool HasNodeScriptAttribute((Type nodeType, NodeScriptAttribute attribute) nodeMetadata)
         {
             if (nodeMetadata.attribute is not null) 
                 return true;
 
             Debug.LogErrorFormat(k_NodePathNotSpecified, nodeMetadata.nodeType.FullName);
             return false;
+        }
+
+        private static bool IsNotExcludedNode((Type nodeType, NodeScriptAttribute attribute) nodeMetadata)
+        {
+            return nodeMetadata.attribute is not null && !nodeMetadata.attribute.ExcludeFromSearch;
+        }
+        
+        private static string BeautifyTitle(string title)
+        {
+            var titleWithoutSuffix = Regex.Replace(title, "Node$", "");
+            var titleWithSpaces = Regex.Replace(titleWithoutSuffix, "([a-z])([A-Z])", "$1 $2");
+            
+            return titleWithSpaces;
         }
 #endif
 

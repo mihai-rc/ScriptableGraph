@@ -11,14 +11,21 @@ namespace GiftHorse.ScriptableGraphs.Attributes
         /// The path to the node's type in the search window tree.
         /// </summary>
         public string SearchPath { get; set; }
+        
+        /// <summary>
+        /// Whether the node should be excluded from search window or not.
+        /// </summary>
+        public bool ExcludeFromSearch { get; set; }
 
         /// <summary>
         /// <see cref="NodeScriptAttribute"/>'s constructor.
         /// </summary>
         /// <param name="path"> The path to the node's type in the search window tree. </param>
-        public NodeScriptAttribute(string path = null)
+        /// <param name="excludeFromSearch"> Whether the node should be excluded from search window or not. </param>
+        public NodeScriptAttribute(string path = null, bool excludeFromSearch = false)
         {
             SearchPath = path;
+            ExcludeFromSearch = excludeFromSearch;
         }
     }
 }

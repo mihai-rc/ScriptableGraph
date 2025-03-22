@@ -15,6 +15,7 @@ namespace GiftHorse.ScriptableGraphs.Editor
         private const string k_IdProperty = "m_Id";
         private const string k_NodesProperty = "m_Nodes";
         private const string k_SerializedPropertyNotFoundError = "[Editor] [ScriptableGraph] Could not find the SerializedProperty of ScriptableGraphNode: {0}, Id: {1}.";
+        private const string k_InvalidNodeProperty = "[Editor] [ScriptableGraph] Could not find the relative property by name: {0}. Make sure you use [NodeField] attribute only with serialized types.";
         
         private readonly ScriptableNode m_ScriptableNode;
         private readonly ScriptableGraphEditorContext m_Context;
@@ -163,6 +164,12 @@ namespace GiftHorse.ScriptableGraphs.Editor
             }
 
             var property = m_SerializedProperty.FindPropertyRelative(propertyName);
+            if (property is null)
+            {
+                Debug.LogErrorFormat(k_InvalidNodeProperty, propertyName);
+                return null;
+            }
+
             var propertyField = new PropertyField(property);
             propertyField.name = k_PropertyFieldName;
             propertyField.Bind(property.serializedObject);
