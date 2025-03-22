@@ -50,8 +50,9 @@ namespace GiftHorse.ScriptableGraphs.Editor
 
         public bool OnSelectEntry(SearchTreeEntry searchTreeEntry, SearchWindowContext context)
         {
-            var windowMousePosition = m_GraphView.ChangeCoordinatesTo(m_GraphView, context.screenMousePosition - m_Window.position.position);
-            var graphMousePosition = m_GraphView.contentContainer.WorldToLocal(windowMousePosition);
+            
+            var windowMousePosition = m_Window.rootVisualElement.ChangeCoordinatesTo(m_GraphView, context.screenMousePosition - m_Window.position.position);
+            var graphMousePosition = m_GraphView.contentViewContainer.WorldToLocal(windowMousePosition);
 
             if (searchTreeEntry.userData is not Type type) 
                 return false;
