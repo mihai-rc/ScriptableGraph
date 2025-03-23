@@ -20,7 +20,7 @@ namespace GiftHorse.ScriptableGraphs
         public List<string> ConnectionIds => m_ConnectionIds;
         
         /// <inheritdoc />
-        public override bool IsConnected => !m_ConnectionIds.Any();
+        public override bool IsEmpty => !m_ConnectionIds?.Any() ?? true;
         
         /// <summary>
         /// <see cref="OutPort"/> constructor.

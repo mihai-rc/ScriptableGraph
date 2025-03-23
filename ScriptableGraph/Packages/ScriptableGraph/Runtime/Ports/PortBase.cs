@@ -15,9 +15,9 @@ namespace GiftHorse.ScriptableGraphs
         [SerializeField] private string m_CompatibleType;
         
         /// <summary>
-        /// Returns whether the port is connected or not.
+        /// Returns true if the port is not part of any connection, otherwise it returns false.
         /// </summary>
-        public abstract bool IsConnected { get; }
+        public abstract bool IsEmpty { get; }
 
         /// <summary>
         /// The name of the port.

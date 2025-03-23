@@ -25,8 +25,12 @@ namespace GiftHorse.ScriptableGraphs
         [SerializeReference] private List<OutPort> m_OutPorts;
 
         private string m_Title;
-        private string m_GraphName;
         private bool m_Initialized;
+        
+        /// <summary>
+        /// Reference to the <see cref="ScriptableGraph"/> that owns this node.
+        /// </summary>
+        protected ScriptableGraph OwnerGraph { get; private set; }
 
         /// <summary>
         /// The id of this node.
@@ -101,14 +105,12 @@ namespace GiftHorse.ScriptableGraphs
         /// <summary>
         /// Node's initialization. It is called only once, when the graph is initialized.
         /// </summary>
-        /// <param name="graph"> The <see cref="ScriptableGraph"/> the owns this node. </param>
-        protected virtual void OnInit(ScriptableGraph graph) { }
+        protected virtual void OnInit() { }
 
         /// <summary>
         /// Node's process implementation.
         /// </summary>
-        /// <param name="graph"> The <see cref="ScriptableGraph"/> the owns this node. </param>
-        protected virtual void OnProcess(ScriptableGraph graph) { }
+        protected virtual void OnProcess() { }
         
         /// <summary>
         /// Node's disposal implementation. It is called when the graph is disposed.
@@ -123,11 +125,11 @@ namespace GiftHorse.ScriptableGraphs
         {
             if (m_Initialized)
                 return;
-
-            m_GraphName = graph.name;
+            
             m_Initialized = true;
+            OwnerGraph = graph;
 
-            OnInit(graph);
+            OnInit();
         }
 
         /// <summary>
@@ -145,7 +147,7 @@ namespace GiftHorse.ScriptableGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_OutOfBoundsInPortIndex, m_GraphName, m_Id, index);
+            Debug.LogErrorFormat(k_OutOfBoundsInPortIndex, OwnerGraph.name, m_Id, index);
 
             return false;
         }
@@ -165,7 +167,7 @@ namespace GiftHorse.ScriptableGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_OutOfBoundsOutPortIndex, m_GraphName, m_Id, index);
+            Debug.LogErrorFormat(k_OutOfBoundsOutPortIndex, OwnerGraph.name, m_Id, index);
 
             return false;
         }
@@ -188,7 +190,7 @@ namespace GiftHorse.ScriptableGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_InPortNameNotFound, m_GraphName, m_Id, inputName);
+            Debug.LogErrorFormat(k_InPortNameNotFound, OwnerGraph.name, m_Id, inputName);
 
             return false;
         }
@@ -211,84 +213,25 @@ namespace GiftHorse.ScriptableGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_OutPortNameNotFound, m_GraphName, m_Id, outputName);
+            Debug.LogErrorFormat(k_OutPortNameNotFound, OwnerGraph.name, m_Id, outputName);
 
             return false;
         }
 
         /// <summary>
-        /// Tries to get the Input node connected to the provided input port with the specified name.
-        /// </summary>
-        /// <param name="inputName"> Name of the port that is connected to the node. </param>
-        /// <param name="graph"> Reference to the owner graph. </param>
-        /// <param name="node"> Reference of the retrieved node. Is null if the node was not found. </param>
-        /// <returns> Returns true if the node was found, otherwise returns false. </returns>
-        public bool TryGetInputNodeOf(string inputName, ScriptableGraph graph, out ScriptableNode node)
-        {
-            node = null;
-            
-            if (!TryFindInPortByName(inputName, out var port))
-                return false;
-            
-            if (string.IsNullOrEmpty(port.ConnectionId))
-                return false;
-
-            if (!graph.TryGetConnectionById(port.ConnectionId, out var connection))
-                return false;
-            
-            if (!graph.TryGetNodeById(connection.FromPort.NodeId, out node))
-                return false;
-            
-            return true;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="outputName"></param>
-        /// <param name="graph"></param>
-        /// <param name="nodes"></param>
-        /// <returns></returns>
-        public bool TryGetOutputNodeOf(string outputName, ScriptableGraph graph, out IEnumerable<ScriptableNode> nodes)
-        {
-            nodes = null;
-            
-            if (!TryFindOutPortByName(outputName, out var port))
-                return false;
-            
-            if (!port.ConnectionIds.Any())
-                return false;
-            
-            nodes = port.ConnectionIds.Select(connectionId =>
-            {
-                if (!graph.TryGetConnectionById(connectionId, out var connection))
-                    return null;
-                
-                if (!graph.TryGetNodeById(connection.ToPort.NodeId, out var node))
-                    return null;
-
-                return node;
-            })
-            .Where(n => n != null);
-            
-            return true;
-        }
-
-        /// <summary>
         /// Processes the node.
         /// </summary>
-        /// <param name="graph"> The <see cref="ScriptableGraph"/> the owns this node. </param>
-        public void Process(ScriptableGraph graph)
+        public void Process()
         {
             foreach (var inPort in InPorts)
             {
-                if (graph.TryGetConnectionById(inPort.ConnectionId, out var connection))
+                if (OwnerGraph.TryGetConnectionById(inPort.ConnectionId, out var connection))
                 {
                     connection.TransferValue();
                 }
             }
             
-            OnProcess(graph);
+            OnProcess();
         }
 
         public void Dispose() => OnDispose();

@@ -22,7 +22,7 @@ namespace GiftHorse.ScriptableGraphs
         }
         
         /// <inheritdoc />
-        public override bool IsConnected => m_ConnectionId is not null;
+        public override bool IsEmpty => string.IsNullOrEmpty(m_ConnectionId);
         
         /// <summary>
         /// <see cref="InPort"/> constructor.

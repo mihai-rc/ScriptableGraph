@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -93,6 +92,8 @@ namespace GiftHorse.ScriptableGraphs
 
         private void OnDestroy()
         {
+            foreach (var node in ScriptableNodes)
+                node.Dispose();
         }
 
         /// <summary>
@@ -214,7 +215,7 @@ namespace GiftHorse.ScriptableGraphs
         public void Process()
         {
             foreach (var node in m_Nodes)
-                node.Process(this);
+                node.Process();
         }
 
         /// <summary>
@@ -353,7 +354,7 @@ namespace GiftHorse.ScriptableGraphs
             int? maxDependencyLevel = null;
             foreach (var inPort in node.InPorts)
             {
-                if (inPort.ConnectionId is null)
+                if (inPort.IsEmpty)
                     continue;
 
                 if (!TryGetConnectionById(inPort.ConnectionId, out var connection))

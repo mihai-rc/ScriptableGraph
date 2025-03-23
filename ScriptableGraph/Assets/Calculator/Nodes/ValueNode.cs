@@ -1,4 +1,3 @@
-using GiftHorse.ScriptableGraphs;
 using GiftHorse.ScriptableGraphs.Attributes;
 
 namespace Calculator
@@ -11,7 +10,7 @@ namespace Calculator
         [NodeField] public Logger Logger;
         [NodeField] public float Input;
 
-        protected override void OnProcess(ScriptableGraph graph)
+        protected override void OnProcess()
         {
             Value = Input;
             Logger.AddLog($"Node: {Id}, has Depth Level: {DepthLevel} and Outputs value: {Value}");
