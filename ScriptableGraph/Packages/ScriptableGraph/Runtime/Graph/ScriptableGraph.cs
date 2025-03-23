@@ -17,6 +17,7 @@ namespace GiftHorse.ScriptableGraphs
         private const string k_PortsOfTheSameNode = "[ScriptableGraph] Trying to connect two ports that belong to the same node! Graph name: {0}, From Port Index: {1} To Port Index: {2}";
         private const string k_NodeNotFound = "[ScriptableGraph] No node was found with Id: {0}! Graph name: {1}.";
         private const string k_ConnectionNotFound = "[ScriptableGraph] No connection was found for Id: {0}! Graph name: {1}.";
+        private const string k_NotIsNotOfType = "[ScriptableGraph] Cast failed! The node with Id: {0} is not of type: {1}! Graph name: {2}.";
 
         [SerializeReference] private List<ScriptableNode> m_Nodes;
         [SerializeReference] private List<Connection> m_Connections;
@@ -237,7 +238,7 @@ namespace GiftHorse.ScriptableGraphs
         public bool TryGetConnectionOriginAs<T>(string connectionId, out T node) where T : ScriptableNode
         {
             node = null;
-            
+
             if (!TryGetConnectionById(connectionId, out var connection))
                 return false;
 
@@ -245,7 +246,10 @@ namespace GiftHorse.ScriptableGraphs
                 return false;
 
             if (originNode is not T castedNode)
+            {
+                Debug.LogErrorFormat(k_NotIsNotOfType, originNode.Id, typeof(T).Name, name);
                 return false;
+            }
 
             node = castedNode;
             return true;
