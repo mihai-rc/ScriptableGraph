@@ -208,7 +208,16 @@ namespace GiftHorse.ScriptableGraphs
             SortNodesByDepthLevel();
             OnConnectionRemoved(fromNode, fromPort, toNode, toPort);
         }
-        
+
+        /// <summary>
+        /// Updates nodes and connections mappings on editor undo.
+        /// </summary>
+        public void UpdateMappings()
+        {
+            m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n);
+            m_ConnectionsById = m_Connections.ToDictionary(c => c.Id, c => c);
+        }
+
         /// <summary>
         /// Executes all nodes processes.
         /// </summary>
@@ -219,14 +228,53 @@ namespace GiftHorse.ScriptableGraphs
         }
 
         /// <summary>
-        /// Updates nodes and connections mappings on editor undo.
+        /// Tries to get the origin node of a connection.
         /// </summary>
-        public void UpdateMappings()
+        /// <param name="connectionId"> The id of the connection. </param>
+        /// <param name="node"> The reference to the origin node. Is null if the node was not found. </param>
+        /// <typeparam name="T"> The subtype the node is expected te be received as. </typeparam>
+        /// <returns> Returns true if the node was found, otherwise returns false. </returns>
+        public bool TryGetConnectionOriginAs<T>(string connectionId, out T node) where T : ScriptableNode
         {
-            m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n);
-            m_ConnectionsById = m_Connections.ToDictionary(c => c.Id, c => c);
+            node = null;
+            
+            if (!TryGetConnectionById(connectionId, out var connection))
+                return false;
+
+            if (!TryGetNodeById(connection.FromPort.NodeId, out var originNode))
+                return false;
+
+            if (originNode is not T castedNode)
+                return false;
+
+            node = castedNode;
+            return true;
         }
-        
+
+        /// <summary>
+        /// Tries to get the destination node of a connection.
+        /// </summary>
+        /// <param name="connectionId"> The id of the connection. </param>
+        /// <param name="node"> The reference to the destination node. Is null if the node was not found. </param>
+        /// <typeparam name="T"> The subtype the node is expected te be received as. </typeparam>
+        /// <returns> Returns true if the node was found, otherwise returns false. </returns>
+        public bool TryGetConnectionDestinationAs<T>(string connectionId, out T node) where T : ScriptableNode
+        {
+            node = null;
+            
+            if (!TryGetConnectionById(connectionId, out var connection))
+                return false;
+
+            if (!TryGetNodeById(connection.ToPort.NodeId, out var destinationNode))
+                return false;
+
+            if (destinationNode is not T castedNode)
+                return false;
+
+            node = castedNode;
+            return true;
+        }
+
         /// <summary>
         /// Tries to get a node by its id.
         /// </summary>
@@ -250,7 +298,7 @@ namespace GiftHorse.ScriptableGraphs
             Debug.LogErrorFormat(k_NodeNotFound, nodeId, name);
             return false;
         }
-        
+
         /// <summary>
         /// Tries to get a connection by its id.
         /// </summary>
@@ -310,7 +358,7 @@ namespace GiftHorse.ScriptableGraphs
 
             return true;
         }
-        
+
         private bool TryDisconnectPorts(OutPort from, InPort to)
         {
             if (!from.ConnectionIds.Contains(to.ConnectionId))
@@ -332,7 +380,7 @@ namespace GiftHorse.ScriptableGraphs
 
             return true;
         }
-        
+
         private void UpdateDependencyLevels(ScriptableNode node)
         {
             if (!m_VisitedNodes.Any())
