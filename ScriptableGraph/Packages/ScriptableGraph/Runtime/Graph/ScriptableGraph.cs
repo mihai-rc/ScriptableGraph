@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -90,6 +91,10 @@ namespace GiftHorse.ScriptableGraphs
             OnStart();
         }
 
+        private void OnDestroy()
+        {
+        }
+
         /// <summary>
         /// Called when a <see cref="Connection"/> is formed.
         /// </summary>
@@ -160,10 +165,10 @@ namespace GiftHorse.ScriptableGraphs
                 return;
             }
 
-            if (!fromNode.TryGetOutPort(fromPortIndex, out var fromPort)) 
+            if (!fromNode.TryGetOutPortByIndex(fromPortIndex, out var fromPort)) 
                 return;
 
-            if (!toNode.TryGetInPort(toPortIndex, out var toPort)) 
+            if (!toNode.TryGetInPortByIndex(toPortIndex, out var toPort)) 
                 return;
 
             if (!TryConnectPorts(fromPort, toPort, out var connection)) 
@@ -189,10 +194,10 @@ namespace GiftHorse.ScriptableGraphs
                 return;
             }
 
-            if (!fromNode.TryGetOutPort(fromPortIndex, out var fromPort)) 
+            if (!fromNode.TryGetOutPortByIndex(fromPortIndex, out var fromPort)) 
                 return;
 
-            if (!toNode.TryGetInPort(toPortIndex, out var toPort)) 
+            if (!toNode.TryGetInPortByIndex(toPortIndex, out var toPort)) 
                 return;
 
             if (!TryDisconnectPorts(fromPort, toPort))
