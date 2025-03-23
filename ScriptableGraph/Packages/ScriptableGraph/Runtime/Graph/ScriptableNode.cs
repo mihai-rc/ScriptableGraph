@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace GiftHorse.ScriptableGraphs
@@ -30,7 +29,7 @@ namespace GiftHorse.ScriptableGraphs
         /// <summary>
         /// Reference to the <see cref="ScriptableGraph"/> that owns this node.
         /// </summary>
-        protected ScriptableGraph OwnerGraph { get; private set; }
+        protected ScriptableGraph Graph { get; private set; }
 
         /// <summary>
         /// The id of this node.
@@ -127,7 +126,7 @@ namespace GiftHorse.ScriptableGraphs
                 return;
             
             m_Initialized = true;
-            OwnerGraph = graph;
+            Graph = graph;
 
             OnInit();
         }
@@ -147,7 +146,7 @@ namespace GiftHorse.ScriptableGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_OutOfBoundsInPortIndex, OwnerGraph.name, m_Id, index);
+            Debug.LogErrorFormat(k_OutOfBoundsInPortIndex, Graph.name, m_Id, index);
 
             return false;
         }
@@ -167,7 +166,7 @@ namespace GiftHorse.ScriptableGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_OutOfBoundsOutPortIndex, OwnerGraph.name, m_Id, index);
+            Debug.LogErrorFormat(k_OutOfBoundsOutPortIndex, Graph.name, m_Id, index);
 
             return false;
         }
@@ -190,7 +189,7 @@ namespace GiftHorse.ScriptableGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_InPortNameNotFound, OwnerGraph.name, m_Id, inputName);
+            Debug.LogErrorFormat(k_InPortNameNotFound, Graph.name, m_Id, inputName);
 
             return false;
         }
@@ -213,7 +212,7 @@ namespace GiftHorse.ScriptableGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_OutPortNameNotFound, OwnerGraph.name, m_Id, outputName);
+            Debug.LogErrorFormat(k_OutPortNameNotFound, Graph.name, m_Id, outputName);
 
             return false;
         }
@@ -225,7 +224,7 @@ namespace GiftHorse.ScriptableGraphs
         {
             foreach (var inPort in InPorts)
             {
-                if (OwnerGraph.TryGetConnectionById(inPort.ConnectionId, out var connection))
+                if (Graph.TryGetConnectionById(inPort.ConnectionId, out var connection))
                 {
                     connection.TransferValue();
                 }
