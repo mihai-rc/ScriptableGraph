@@ -17,14 +17,13 @@ namespace GiftHorse.ScriptableGraphs
         private const string k_PortsOfTheSameNode = "[ScriptableGraph] Trying to connect two ports that belong to the same node! Graph name: {0}, From Port Index: {1} To Port Index: {2}";
         private const string k_NodeNotFound = "[ScriptableGraph] No node was found with Id: {0}! Graph name: {1}.";
         private const string k_ConnectionNotFound = "[ScriptableGraph] No connection was found for Id: {0}! Graph name: {1}.";
-        private const string k_NotIsNotOfType = "[ScriptableGraph] Cast failed! The node with Id: {0} is not of type: {1}! Graph name: {2}.";
+        private const string k_NodeCastFailed = "[ScriptableGraph] Cast failed! The node with Id: {0} is not of type: {1}! Graph name: {2}.";
 
         [SerializeReference] private List<ScriptableNode> m_Nodes;
         [SerializeReference] private List<Connection> m_Connections;
 
         private Dictionary<string, ScriptableNode> m_NodesById;
         private Dictionary<string, Connection> m_ConnectionsById;
-        private readonly HashSet<string> m_VisitedNodes = new();
 
         /// <summary>
         /// The Assembly Qualified Name of <see cref="ScriptableNode"/>'s specialized type.
@@ -40,7 +39,7 @@ namespace GiftHorse.ScriptableGraphs
         /// List of all connections.
         /// </summary>
         public List<Connection> Connections => m_Connections;
-        
+
         /// <summary>
         /// Returns whether the scene this graph is serialized into is loaded.
         /// </summary>
@@ -175,9 +174,7 @@ namespace GiftHorse.ScriptableGraphs
 
             if (!TryConnectPorts(fromPort, toPort, out var connection)) 
                 return;
-
-            UpdateDependencyLevels(toNode);
-            SortNodesByDepthLevel();
+            
             OnConnectionCreated(fromNode, fromPort, toNode, toPort);
         }
 
@@ -204,9 +201,7 @@ namespace GiftHorse.ScriptableGraphs
 
             if (!TryDisconnectPorts(fromPort, toPort))
                 return;
-
-            UpdateDependencyLevels(toNode);
-            SortNodesByDepthLevel();
+            
             OnConnectionRemoved(fromNode, fromPort, toNode, toPort);
         }
 
@@ -220,12 +215,35 @@ namespace GiftHorse.ScriptableGraphs
         }
 
         /// <summary>
-        /// Executes all nodes processes.
+        /// Tries to get a node by its id.
         /// </summary>
-        public void Process()
+        /// <param name="nodeId"> The id of the node. </param>
+        /// <param name="node"> The reference to the corresponding node. Is null if the id was not found. </param>
+        /// <typeparam name="T"> The subtype the node is expected te be received as. </typeparam>
+        /// <returns> Returns true if the node was found, otherwise returns false. </returns>
+        public bool TryGetNodeById<T>(string nodeId, out T node) where T : ScriptableNode
         {
-            foreach (var node in m_Nodes)
-                node.Process();
+            node = null;
+            if (!IsSceneLoaded)
+            {
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                return false;
+            }
+
+            if (NodesById.TryGetValue(nodeId, out var nodeBase))
+            {
+                if (nodeBase is not T castedNode)
+                {
+                    Debug.LogErrorFormat(k_NodeCastFailed, nodeId, typeof(T).Name, name);
+                    return false;
+                }
+
+                node = castedNode;
+                return true;
+            }
+
+            Debug.LogErrorFormat(k_NodeNotFound, nodeId, name);
+            return false;
         }
 
         /// <summary>
@@ -235,23 +253,16 @@ namespace GiftHorse.ScriptableGraphs
         /// <param name="node"> The reference to the origin node. Is null if the node was not found. </param>
         /// <typeparam name="T"> The subtype the node is expected te be received as. </typeparam>
         /// <returns> Returns true if the node was found, otherwise returns false. </returns>
-        public bool TryGetConnectionOriginAs<T>(string connectionId, out T node) where T : ScriptableNode
+        public bool TryGetInputNode<T>(string connectionId, out T node) where T : ScriptableNode
         {
             node = null;
 
             if (!TryGetConnectionById(connectionId, out var connection))
                 return false;
 
-            if (!TryGetNodeById(connection.FromPort.NodeId, out var originNode))
+            if (!TryGetNodeById(connection.FromPort.NodeId, out node))
                 return false;
-
-            if (originNode is not T castedNode)
-            {
-                Debug.LogErrorFormat(k_NotIsNotOfType, originNode.Id, typeof(T).Name, name);
-                return false;
-            }
-
-            node = castedNode;
+            
             return true;
         }
 
@@ -262,45 +273,17 @@ namespace GiftHorse.ScriptableGraphs
         /// <param name="node"> The reference to the destination node. Is null if the node was not found. </param>
         /// <typeparam name="T"> The subtype the node is expected te be received as. </typeparam>
         /// <returns> Returns true if the node was found, otherwise returns false. </returns>
-        public bool TryGetConnectionDestinationAs<T>(string connectionId, out T node) where T : ScriptableNode
+        public bool TryGetOutputNode<T>(string connectionId, out T node) where T : ScriptableNode
         {
             node = null;
             
             if (!TryGetConnectionById(connectionId, out var connection))
                 return false;
 
-            if (!TryGetNodeById(connection.ToPort.NodeId, out var destinationNode))
+            if (!TryGetNodeById(connection.ToPort.NodeId, out node))
                 return false;
-
-            if (destinationNode is not T castedNode)
-                return false;
-
-            node = castedNode;
+            
             return true;
-        }
-
-        /// <summary>
-        /// Tries to get a node by its id.
-        /// </summary>
-        /// <param name="nodeId"> The id of the node. </param>
-        /// <param name="node"> The reference to the corresponding node. Is null if the id was not found. </param>
-        /// <returns> Returns true if the node was found, otherwise returns false. </returns>
-        public bool TryGetNodeById(string nodeId, out ScriptableNode node)
-        {
-            node = null;
-            if (!IsSceneLoaded)
-            {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
-                return false;
-            }
-
-            if (NodesById.TryGetValue(nodeId, out node))
-            {
-                return true;
-            }
-
-            Debug.LogErrorFormat(k_NodeNotFound, nodeId, name);
-            return false;
         }
 
         /// <summary>
@@ -308,8 +291,9 @@ namespace GiftHorse.ScriptableGraphs
         /// </summary>
         /// <param name="connectionId"> The id of the connection. </param>
         /// <param name="connection"> The reference to the corresponding connection. Is null if the id was not found. </param>
+        /// <param name="logErrorIfNotFound"> </param>
         /// <returns> Returns true if the connection was found, otherwise returns false. </returns>
-        public bool TryGetConnectionById(string connectionId, out Connection connection)
+        public bool TryGetConnectionById(string connectionId, out Connection connection, bool logErrorIfNotFound = true)
         {
             connection = null;
             if (!IsSceneLoaded)
@@ -383,76 +367,6 @@ namespace GiftHorse.ScriptableGraphs
             ConnectionsById.Remove(connection.Id);
 
             return true;
-        }
-
-        private void UpdateDependencyLevels(ScriptableNode node)
-        {
-            if (!m_VisitedNodes.Any())
-                m_VisitedNodes.Clear();
-
-            UpdateDependencyLevelsRecursively(node);
-            m_VisitedNodes.Clear();
-        }
-
-        private void UpdateDependencyLevelsRecursively(ScriptableNode node)
-        {
-            if (m_VisitedNodes.Contains(node.Id))
-                return;
-
-            // By traversing the subgraph of the inputs without accounting for the nodes that are connected in a circle
-            // will result in the dependency level of those nodes to be evaluated as the inputs of the first visited node
-            // of the circle, which can lead to some unexpected behavior.
-            
-            int? maxDependencyLevel = null;
-            foreach (var inPort in node.InPorts)
-            {
-                if (inPort.IsEmpty)
-                    continue;
-
-                if (!TryGetConnectionById(inPort.ConnectionId, out var connection))
-                    continue;
-
-                if (!TryGetNodeById(connection.FromPort.NodeId, out var inNode))
-                    continue;
-
-                if (maxDependencyLevel is null || inNode.DepthLevel > maxDependencyLevel.Value)
-                    maxDependencyLevel = inNode.DepthLevel;
-            }
-
-            node.DepthLevel = maxDependencyLevel is not null 
-                ? maxDependencyLevel.Value + 1
-                : 0;
-
-            m_VisitedNodes.Add(node.Id);
-            foreach (var outPort in node.OutPorts)
-            {
-                foreach (var connectionId in outPort.ConnectionIds)
-                {
-                    if (!TryGetConnectionById(connectionId, out var connection))
-                    {
-                        continue;
-                    }
-
-                    if (!TryGetNodeById(connection.ToPort.NodeId, out var outNode))
-                        continue;
-
-                    UpdateDependencyLevelsRecursively(outNode);
-                }
-            }
-        }
-
-        private void SortNodesByDepthLevel()
-        {
-            ScriptableNodes.Sort((left, right) =>
-            {
-                if (left.DepthLevel < right.DepthLevel) 
-                    return -1;
-                
-                if (left.DepthLevel > right.DepthLevel) 
-                    return  1;
-                
-                return 0;
-            });
         }
     }
 }

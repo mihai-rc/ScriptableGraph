@@ -18,7 +18,6 @@ namespace GiftHorse.ScriptableGraphs
         [SerializeField] private string m_Id;
         [SerializeField] private Rect m_Position;
         [SerializeField] private bool m_Expanded;
-        [SerializeField] private int m_DepthLevel;
 
         [SerializeReference] private List<InPort> m_InPorts;
         [SerializeReference] private List<OutPort> m_OutPorts;
@@ -52,16 +51,6 @@ namespace GiftHorse.ScriptableGraphs
         {
             get => m_Expanded;
             set => m_Expanded = value;
-        }
-
-        /// <summary>
-        /// Number of nodes in the longest input chain this node is part of. It is used by
-        /// the sorting algorithm to figure out in which order the nodes should be evaluated.
-        /// </summary>
-        public int DepthLevel
-        {
-            get => m_DepthLevel;
-            set => m_DepthLevel = value;
         }
 
         /// <summary>
@@ -215,22 +204,6 @@ namespace GiftHorse.ScriptableGraphs
             Debug.LogErrorFormat(k_OutPortNameNotFound, Graph.name, m_Id, outputName);
 
             return false;
-        }
-
-        /// <summary>
-        /// Processes the node.
-        /// </summary>
-        public void Process()
-        {
-            foreach (var inPort in InPorts)
-            {
-                if (Graph.TryGetConnectionById(inPort.ConnectionId, out var connection))
-                {
-                    connection.TransferValue();
-                }
-            }
-            
-            OnProcess();
         }
 
         public void Dispose() => OnDispose();
