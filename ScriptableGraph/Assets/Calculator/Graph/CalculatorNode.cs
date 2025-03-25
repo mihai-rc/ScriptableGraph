@@ -24,10 +24,11 @@ namespace Calculator
         {
             foreach (var inPort in InPorts)
             {
+                if (inPort.IsEmpty)
+                    continue;
+                
                 if (Graph.TryGetConnectionById(inPort.ConnectionId, out var connection))
-                {
                     connection.TransferValue();
-                }
             }
             
             OnProcess();

@@ -54,7 +54,7 @@ namespace GiftHorse.ScriptableGraphs
             {
                 if (m_NodesById is null)
                     m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n);
-
+                
                 return m_NodesById;
             }
         }
@@ -68,7 +68,7 @@ namespace GiftHorse.ScriptableGraphs
             {
                 if (m_ConnectionsById is null)
                     m_ConnectionsById = m_Connections.ToDictionary(c => c.Id, c => c);
-
+                
                 return m_ConnectionsById;
             }
         }
@@ -130,7 +130,7 @@ namespace GiftHorse.ScriptableGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return;
             }
-
+            
             m_Nodes.Add(node);
             NodesById[node.Id] = node;
         }
@@ -146,7 +146,7 @@ namespace GiftHorse.ScriptableGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return;
             }
-
+            
             m_Nodes.Remove(node);
             NodesById.Remove(node.Id);
         }
@@ -165,19 +165,19 @@ namespace GiftHorse.ScriptableGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return;
             }
-
+            
             if (!fromNode.TryGetOutPortByIndex(fromPortIndex, out var fromPort)) 
                 return;
-
+            
             if (!toNode.TryGetInPortByIndex(toPortIndex, out var toPort)) 
                 return;
-
+            
             if (!TryConnectPorts(fromPort, toPort, out var connection)) 
                 return;
             
             OnConnectionCreated(fromNode, fromPort, toNode, toPort);
         }
-
+        
         /// <summary>
         /// Disconnects two <see cref="ScriptableNode"/>s at the specified port indices and removes the <see cref="Connection"/> from the graph data structure.
         /// </summary>
@@ -192,13 +192,13 @@ namespace GiftHorse.ScriptableGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return;
             }
-
+            
             if (!fromNode.TryGetOutPortByIndex(fromPortIndex, out var fromPort)) 
                 return;
-
+            
             if (!toNode.TryGetInPortByIndex(toPortIndex, out var toPort)) 
                 return;
-
+            
             if (!TryDisconnectPorts(fromPort, toPort))
                 return;
             
@@ -229,7 +229,7 @@ namespace GiftHorse.ScriptableGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return false;
             }
-
+            
             if (NodesById.TryGetValue(nodeId, out var nodeBase))
             {
                 if (nodeBase is not T castedNode)
@@ -237,11 +237,11 @@ namespace GiftHorse.ScriptableGraphs
                     Debug.LogErrorFormat(k_NodeCastFailed, nodeId, typeof(T).Name, name);
                     return false;
                 }
-
+                
                 node = castedNode;
                 return true;
             }
-
+            
             Debug.LogErrorFormat(k_NodeNotFound, nodeId, name);
             return false;
         }
@@ -256,10 +256,15 @@ namespace GiftHorse.ScriptableGraphs
         public bool TryGetInputNode<T>(string connectionId, out T node) where T : ScriptableNode
         {
             node = null;
-
+            if (!IsSceneLoaded)
+            {
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                return false;
+            }
+            
             if (!TryGetConnectionById(connectionId, out var connection))
                 return false;
-
+            
             if (!TryGetNodeById(connection.FromPort.NodeId, out node))
                 return false;
             
@@ -276,10 +281,15 @@ namespace GiftHorse.ScriptableGraphs
         public bool TryGetOutputNode<T>(string connectionId, out T node) where T : ScriptableNode
         {
             node = null;
+            if (!IsSceneLoaded)
+            {
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                return false;
+            }
             
             if (!TryGetConnectionById(connectionId, out var connection))
                 return false;
-
+            
             if (!TryGetNodeById(connection.ToPort.NodeId, out node))
                 return false;
             
@@ -301,11 +311,9 @@ namespace GiftHorse.ScriptableGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return false;
             }
-
+            
             if (ConnectionsById.TryGetValue(connectionId, out connection))
-            {
                 return true;
-            }
             
             Debug.LogErrorFormat(k_ConnectionNotFound, connectionId, name);
             return false;
@@ -356,9 +364,7 @@ namespace GiftHorse.ScriptableGraphs
             }
 
             if (!TryGetConnectionById(to.ConnectionId, out var connection))
-            {
                 return false;
-            }
 
             from.ConnectionIds.Remove(connection.Id);
             to.ConnectionId = null;
