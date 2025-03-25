@@ -71,10 +71,10 @@ namespace GiftHorse.ScriptableGraphs
         }
 
         private static InPort CreateInPort(FieldInfo fieldInfo, string nodeId, int index) => 
-            new(BeautifyTitle(fieldInfo.Name), nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
+            new(fieldInfo.Name, nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
 
         private static OutPort CreateOutPort(FieldInfo fieldInfo, string nodeId, int index) => 
-            new(BeautifyTitle(fieldInfo.Name), nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
+            new(fieldInfo.Name, nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
 
 #if UNITY_EDITOR
         public static List<(Type type, string title, string[] path)> GetNodeSearchEntries(ScriptableGraph graph)
