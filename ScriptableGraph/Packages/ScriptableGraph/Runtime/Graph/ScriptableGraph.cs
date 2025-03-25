@@ -301,9 +301,8 @@ namespace GiftHorse.ScriptableGraphs
         /// </summary>
         /// <param name="connectionId"> The id of the connection. </param>
         /// <param name="connection"> The reference to the corresponding connection. Is null if the id was not found. </param>
-        /// <param name="logErrorIfNotFound"> </param>
         /// <returns> Returns true if the connection was found, otherwise returns false. </returns>
-        public bool TryGetConnectionById(string connectionId, out Connection connection, bool logErrorIfNotFound = true)
+        public bool TryGetConnectionById(string connectionId, out Connection connection)
         {
             connection = null;
             if (!IsSceneLoaded)

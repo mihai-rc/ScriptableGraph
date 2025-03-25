@@ -5,6 +5,7 @@ namespace GiftHorse.ScriptableGraphs.Attributes
     /// <summary>
     /// Attribute class used to specify the node's type path.
     /// </summary>
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class NodeScriptAttribute : Attribute
     {
         /// <summary>

@@ -16,7 +16,6 @@ namespace GiftHorse.ScriptableGraphs
     {
         private const BindingFlags k_BindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         private const string k_NotSubTypeOfScriptableNode = "[ScriptableGraph] Cannot process type: {0} because it is not a subtype of ScriptableNode!";
-        private const string k_NodePathNotSpecified = "[ScriptableGraph] Cannot add node of type: {0} to serach window because it does not specify the path in the search tree!";
         
         public static bool IsNodeExcludedFromSearch(Type nodeType)
         {
@@ -89,9 +88,9 @@ namespace GiftHorse.ScriptableGraphs
 
             return TypeCache
                 .GetTypesDerivedFrom(nodeBaseType)
-                .Select(t => (Type: t, NodePath: t.GetCustomAttribute<NodeScriptAttribute>()))
-                .Where(tmd => HasNodeScriptAttribute(tmd) && IsNotExcludedNode(tmd))
-                .Select(tp => (tp.Type, GetNodeTitleByType(tp.Type), tp.NodePath?.SearchPath?.Split('/')))
+                .Select(t => (Type: t, NodeScript: t.GetCustomAttribute<NodeScriptAttribute>()))
+                .Where(tmd => tmd.NodeScript is not null && IsNotExcludedNode(tmd))
+                .Select(tp => (tp.Type, GetNodeTitleByType(tp.Type), tp.NodeScript?.SearchPath?.Split('/')))
                 .ToList();
         }
 
@@ -129,15 +128,6 @@ namespace GiftHorse.ScriptableGraphs
                 .Where(fieldInfo => IsSubclassOfNode(type) && fieldInfo
                 .GetCustomAttribute<NodeFieldAttribute>() is not null)
                 .Select(fieldInfo => fieldInfo.Name);
-        }
-
-        private static bool HasNodeScriptAttribute((Type nodeType, NodeScriptAttribute attribute) nodeMetadata)
-        {
-            if (nodeMetadata.attribute is not null) 
-                return true;
-
-            Debug.LogErrorFormat(k_NodePathNotSpecified, nodeMetadata.nodeType.FullName);
-            return false;
         }
 
         private static bool IsNotExcludedNode((Type nodeType, NodeScriptAttribute attribute) nodeMetadata)
