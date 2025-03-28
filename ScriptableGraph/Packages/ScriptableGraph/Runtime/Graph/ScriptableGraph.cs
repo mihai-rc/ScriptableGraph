@@ -24,6 +24,7 @@ namespace GiftHorse.ScriptableGraphs
 
         private Dictionary<string, ScriptableNode> m_NodesById;
         private Dictionary<string, Connection> m_ConnectionsById;
+        private readonly HashSet<string> m_VisitedNodes = new();
 
         /// <summary>
         /// The Assembly Qualified Name of <see cref="ScriptableNode"/>'s specialized type.
@@ -118,6 +119,15 @@ namespace GiftHorse.ScriptableGraphs
         /// It is called on the Start event of the <see cref="GameObject"/> the graph is attached to.
         /// </summary>
         protected virtual void OnStart() { }
+        
+        /// <summary>
+        /// Executes all nodes processes.
+        /// </summary>
+        public void Process()
+        {
+            foreach (var node in ScriptableNodes)
+                node.Process();
+        }
 
         /// <summary>
         /// Adds a <see cref="ScriptableNode"/> to the graph data structure.
@@ -175,6 +185,8 @@ namespace GiftHorse.ScriptableGraphs
             if (!TryConnectPorts(fromPort, toPort, out var connection)) 
                 return;
             
+            UpdateDependencyLevels(toNode);
+            SortNodesByDepthLevel();
             OnConnectionCreated(fromNode, fromPort, toNode, toPort);
         }
         
@@ -202,6 +214,8 @@ namespace GiftHorse.ScriptableGraphs
             if (!TryDisconnectPorts(fromPort, toPort))
                 return;
             
+            UpdateDependencyLevels(toNode);
+            SortNodesByDepthLevel();
             OnConnectionRemoved(fromNode, fromPort, toNode, toPort);
         }
 
@@ -372,6 +386,65 @@ namespace GiftHorse.ScriptableGraphs
             ConnectionsById.Remove(connection.Id);
 
             return true;
+        }
+        
+        private void UpdateDependencyLevels(ScriptableNode node)
+        {
+            if (!m_VisitedNodes.Any())
+                m_VisitedNodes.Clear();
+
+            UpdateDependencyLevelsRecursively(node);
+            m_VisitedNodes.Clear();
+        }
+
+        private void UpdateDependencyLevelsRecursively(ScriptableNode node)
+        {
+            if (m_VisitedNodes.Contains(node.Id))
+                return;
+
+            // By traversing the subgraph of the inputs without accounting for the nodes that are connected in a circle
+            // will result in the dependency level of those nodes to be evaluated as the inputs of the first visited node
+            // of the circle, which can lead to some unexpected behavior.
+            
+            int? maxDependencyLevel = null;
+            foreach (var inPort in node.InPorts)
+            {
+                if (inPort.IsEmpty)
+                    continue;
+                
+                if (!TryGetInputNode(inPort.ConnectionId, out ScriptableNode inNode))
+                    continue;
+
+                if (maxDependencyLevel is null || inNode.DepthLevel > maxDependencyLevel.Value)
+                    maxDependencyLevel = inNode.DepthLevel;
+            }
+
+            node.DepthLevel = maxDependencyLevel is not null 
+                ? maxDependencyLevel.Value + 1
+                : 0;
+
+            m_VisitedNodes.Add(node.Id);
+            foreach (var outPort in node.OutPorts)
+            {
+                foreach (var connectionId in outPort.ConnectionIds)
+                {
+                    if (!TryGetOutputNode(connectionId, out ScriptableNode outNode))
+                        continue;
+
+                    UpdateDependencyLevelsRecursively(outNode);
+                }
+            }
+        }
+
+        private void SortNodesByDepthLevel()
+        {
+            ScriptableNodes.Sort((left, right) =>
+            {
+                if (left.DepthLevel < right.DepthLevel) return -1;
+                if (left.DepthLevel > right.DepthLevel) return  1;
+
+                return 0;
+            });
         }
     }
 }

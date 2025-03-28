@@ -6,8 +6,8 @@ namespace GiftHorse.ScriptableGraphs.Editor
 {
     public class ScriptableGraphEditorContext
     {
-        public ScriptableGraph Graph { get; }
         public ScriptableGraphWindow Window { get; }
+        public ScriptableGraph Graph { get; private set; }
         public ScriptableGraphView GraphView { get; private set; }
         public SerializedObject SerializedObject { get; private set; }
         
@@ -44,6 +44,12 @@ namespace GiftHorse.ScriptableGraphs.Editor
 
         public void MarkAssetAsDirty()
         {
+            if (Graph == null)
+            {
+                if (Window.TryGetScriptableGraph(out var graph))
+                    Graph = graph;
+            }
+                
             EditorUtility.SetDirty(Graph);
         }
     }

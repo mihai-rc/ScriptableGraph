@@ -34,27 +34,35 @@ namespace GiftHorse.ScriptableGraphs.Editor
         private ScriptableGraphEditorContext m_Context;
         private Scene m_Scene;
 
-        private void OnEnable()
+        public bool TryGetScriptableGraph(out ScriptableGraph graph)
         {
+            graph = null;
             if (string.IsNullOrEmpty(m_GraphHierarchyPath)) 
-                return;
+                return false;
 
             // This way we can keep the window open between editor sessions but this method
             // only works if the owner GameObject has only one ScriptableGraph component attached.
 
-            // TODO: Revisit.
-            var serializedGraph = GameObject
+            graph = GameObject
                 .Find(m_GraphHierarchyPath)
                 .GetComponent<ScriptableGraph>();
 
-            if (serializedGraph is null)
+            return true;
+        }
+
+        private void OnEnable()
+        {
+            if (!TryGetScriptableGraph(out var graph)) 
+                return;
+
+            if (graph is null)
             {
                 CloseWindow();
                 return;
             }
 
-            m_Scene = serializedGraph.gameObject.scene;
-            Load(serializedGraph);
+            m_Scene = graph.gameObject.scene;
+            Load(graph);
         }
 
         private void OnDestroy() => EditorSceneManager.activeSceneChangedInEditMode -= OnSceneChanged; 

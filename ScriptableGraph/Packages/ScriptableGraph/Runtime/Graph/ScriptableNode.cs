@@ -10,6 +10,7 @@ namespace GiftHorse.ScriptableGraphs
     [Serializable]
     public class ScriptableNode : IDisposable
     {
+        private const string k_NodeNotInitialized = "[ScriptableGraph] Trying to process a node that was not initialized! Graph name: {0}, Node id: {1}";
         private const string k_OutOfBoundsInPortIndex = "[ScriptableGraph] Trying to get an In port by an out of bounds index! Graph name: {0}, Node id: {1}, In Port index: {2}";
         private const string k_OutOfBoundsOutPortIndex = "[ScriptableGraph] Trying to get an Out port by an out of bounds index! Graph name: {0}, Node id: {1}, Out Port index: {2}";
         private const string k_InPortNameNotFound = "[ScriptableGraph] Trying to find an In port by a name that was not registered! Graph name: {0}, Node id: {1}, In Port name: {2}";
@@ -17,6 +18,7 @@ namespace GiftHorse.ScriptableGraphs
 
         [SerializeField] private string m_Id;
         [SerializeField] private Rect m_Position;
+        [SerializeField] private int m_DepthLevel;
         [SerializeField] private bool m_Expanded;
 
         [SerializeReference] private List<InPort> m_InPorts;
@@ -45,6 +47,16 @@ namespace GiftHorse.ScriptableGraphs
         }
 
         /// <summary>
+        /// Number of nodes in the longest input chain this node is part of. It is used by
+        /// the sorting algorithm to figure out in which order the nodes should be evaluated.
+        /// </summary>
+        public int DepthLevel
+        {
+            get => m_DepthLevel;
+            set => m_DepthLevel = value;
+        }
+
+        /// <summary>
         /// Flag used by Unity Editor to toggle between Expanded/Collapse states in the Graph View.
         /// </summary>
         public bool Expanded
@@ -62,7 +74,7 @@ namespace GiftHorse.ScriptableGraphs
         /// Collection of all output ports of the node.
         /// </summary>
         public IEnumerable<OutPort> OutPorts => m_OutPorts;
-        
+
         /// <summary>
         /// The title of the node. It is displayed on node view header.
         /// </summary>
@@ -99,7 +111,7 @@ namespace GiftHorse.ScriptableGraphs
         /// Node's process implementation.
         /// </summary>
         protected virtual void OnProcess() { }
-        
+
         /// <summary>
         /// Node's disposal implementation. It is called when the graph is disposed.
         /// </summary>
@@ -119,6 +131,31 @@ namespace GiftHorse.ScriptableGraphs
 
             OnInit();
         }
+
+        /// <summary>
+        /// Processes the node.
+        /// </summary>
+        public void Process()
+        {
+            if (!m_Initialized)
+                Debug.LogErrorFormat(k_NodeNotInitialized, Graph.name, m_Id);
+            
+            foreach (var inPort in InPorts)
+            {
+                if (inPort.IsEmpty)
+                    continue;
+                
+                if (Graph.TryGetConnectionById(inPort.ConnectionId, out var connection))
+                    connection.TransferValue();
+            }
+            
+            OnProcess();
+        }
+
+        /// <summary>
+        /// Releases the unmanaged resources used by the <see cref="ScriptableNode"/>.
+        /// </summary>
+        public void Dispose() => OnDispose();
 
         /// <summary>
         /// Tries to get the Input port at the provided index.
@@ -205,7 +242,5 @@ namespace GiftHorse.ScriptableGraphs
 
             return false;
         }
-
-        public void Dispose() => OnDispose();
     }
 }
