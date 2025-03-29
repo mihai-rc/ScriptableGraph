@@ -9,6 +9,9 @@ using UnityEngine.Pool;
 
 namespace GiftHorse.ScriptableGraphs.Editor
 {
+    /// <summary>
+    /// Node search window for creating new nodes in the graph editor.
+    /// </summary>
     public class NodeSearchWindow : ScriptableObject, ISearchWindowProvider
     {
         private struct SearchElement
@@ -25,6 +28,10 @@ namespace GiftHorse.ScriptableGraphs.Editor
         private ScriptableGraphView m_GraphView;
         private ScriptableGraph m_ScriptableGraph;
 
+        /// <summary>
+        /// Initializes the search window with the context of the graph editor.
+        /// </summary>
+        /// <param name="context"> Reference to the <see cref="ScriptableGraphEditorContext"/> of this graph. </param>
         public void Init(ScriptableGraphEditorContext context)
         {
             m_Window = context.Window;
@@ -32,10 +39,11 @@ namespace GiftHorse.ScriptableGraphs.Editor
             m_ScriptableGraph = context.Graph;
         }
 
+        /// <inheritdoc />
         public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context)
         {
             var elements = ReflectionHelper
-                .GetNodeSearchEntries(m_ScriptableGraph)
+                .GetNodeSearchEntries(m_ScriptableGraph.NodesBaseType)
                 .Select(e => new SearchElement
                 {
                     Type = e.type,
@@ -48,6 +56,7 @@ namespace GiftHorse.ScriptableGraphs.Editor
             return PopulateTree(elements);
         }
 
+        /// <inheritdoc />
         public bool OnSelectEntry(SearchTreeEntry searchTreeEntry, SearchWindowContext context)
         {
             

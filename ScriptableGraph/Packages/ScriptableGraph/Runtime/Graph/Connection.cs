@@ -54,7 +54,7 @@ namespace GiftHorse.ScriptableGraphs
         public void Init(Dictionary<string, ScriptableNode> nodesById) => m_TransferValueFn = CreateTransferValueDelegate(nodesById);
         
         /// <summary>
-        /// Transfer the value from the emitting output field to the receiving input field.
+        /// Transfer the value from the emitting output field into the receiving input field.
         /// </summary>
         public void TransferValue() => m_TransferValueFn?.Invoke();
 
@@ -69,6 +69,11 @@ namespace GiftHorse.ScriptableGraphs
         /// A delegate that assigns the input field of the receiving
         /// node to the output field of the emitting node.
         /// </returns>
+        /// <remarks>
+        /// In order for this to work, the fields of the nodes must be public and the <see cref="ScriptableGraph.ScriptableNodes"/>
+        /// should be kept sorted by their Depth Level so that the output field is always assigned before the input field.
+        /// TODO: Make sure that this approach works well Apple policies. If not, change the solution to use code generation to achieve the same result.
+        /// </remarks>
         private Action CreateTransferValueDelegate(Dictionary<string, ScriptableNode> nodesById)
         {
             var fromNode = nodesById[m_FromPort.NodeId];

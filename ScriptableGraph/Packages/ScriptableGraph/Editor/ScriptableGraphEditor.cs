@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace GiftHorse.ScriptableGraphs.Editor
 {
+    /// <summary>
+    /// Custom inspector editor of the <see cref="ScriptableGraph"/> class.
+    /// </summary>
     [CustomEditor(typeof(ScriptableGraph), true)]
     public class ScriptableGraphEditor : UnityEditor.Editor
     {
@@ -16,6 +19,7 @@ namespace GiftHorse.ScriptableGraphs.Editor
             ScriptableGraphWindow.Open(command.context as ScriptableGraph);
         }
 
+        /// <inheritdoc />
         public override void OnInspectorGUI()
         {
             var editGraphButton = GUILayout.Button(k_ButtonText, GUILayout.Height(k_ButtonsHeight));

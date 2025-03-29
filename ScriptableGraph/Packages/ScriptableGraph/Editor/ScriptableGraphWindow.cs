@@ -5,11 +5,18 @@ using UnityEngine.SceneManagement;
 
 namespace GiftHorse.ScriptableGraphs.Editor
 {
+    /// <summary>
+    /// <see cref="EditorWindow"/> class used to display a <see cref="ScriptableGraphView"/> in the editor.
+    /// </summary>
     public class ScriptableGraphWindow : EditorWindow
     {
         private const string k_WindowIcon = "d_SceneViewTools";
         private const string k_ComponentNotFound = "[Editor] [ScriptableGraph] ScriptableGraph component couldn't be found at the cached path: {0}.";
 
+        /// <summary>
+        /// Opens a <see cref="ScriptableGraphWindow"/> for the given <see cref="ScriptableGraph"/>.
+        /// </summary>
+        /// <param name="sceneAsset"> Reference to the graph component the window will edit. </param>
         public static void Open(ScriptableGraph sceneAsset)
         {
             var windows = Resources.FindObjectsOfTypeAll<ScriptableGraphWindow>();
@@ -34,6 +41,11 @@ namespace GiftHorse.ScriptableGraphs.Editor
         private ScriptableGraphEditorContext m_Context;
         private Scene m_Scene;
 
+        /// <summary>
+        /// Tries to find the <see cref="ScriptableGraph"/> component in the active scene from the cached path.
+        /// </summary>
+        /// <param name="graph"> The reference to the <see cref="ScriptableGraph"/> if found, otherwise is null. </param>
+        /// <returns> Returns whether the <see cref="ScriptableGraph"/> was found or not. </returns>
         public bool TryGetScriptableGraph(out ScriptableGraph graph)
         {
             graph = null;

@@ -17,18 +17,11 @@ namespace GiftHorse.ScriptableGraphs
         private const BindingFlags k_BindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         private const string k_NotSubTypeOfScriptableNode = "[ScriptableGraph] Cannot process type: {0} because it is not a subtype of ScriptableNode!";
         
-        public static bool IsNodeExcludedFromSearch(Type nodeType)
-        {
-            if (!IsSubclassOfNode(nodeType))
-            {
-                Debug.LogErrorFormat(k_NotSubTypeOfScriptableNode, nodeType.FullName);
-                return false;
-            }
-
-            var nodeScriptAttribute = nodeType.GetCustomAttribute<NodeScriptAttribute>();
-            return nodeScriptAttribute?.ExcludeFromSearch ?? false;
-        }
-        
+        /// <summary>
+        /// Gets the title of the node based on its type.
+        /// </summary>
+        /// <param name="nodeType"> The type of the node. </param>
+        /// <returns> Returns the formated title. </returns>
         public static string GetNodeTitleByType(Type nodeType)
         {
             if (!IsSubclassOfNode(nodeType))
@@ -40,6 +33,13 @@ namespace GiftHorse.ScriptableGraphs
             return BeautifyTitle(nodeType.Name);
         }
 
+        /// <summary>
+        /// Gets the input and output ports of a node.
+        /// </summary>
+        /// <param name="node"> The node whose ports are being fetched. </param>
+        /// <param name="inPorts"> Out reference of the list containing all the input ports. </param>
+        /// <param name="outPorts"> Out reference of the list containing all the output ports. </param>
+        /// TODO: Consider using lists from ListPool to avoid allocations.
         public static void GetNodePorts(ScriptableNode node, out List<InPort> inPorts, out List<OutPort> outPorts)
         {
             var type = node.GetType();
@@ -77,9 +77,15 @@ namespace GiftHorse.ScriptableGraphs
             new(fieldInfo.Name, nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
 
 #if UNITY_EDITOR
-        public static List<(Type type, string title, string[] path)> GetNodeSearchEntries(ScriptableGraph graph)
+        /// <summary>
+        /// Returns a list of metadata tuples of all the nodes that are derived from the given base type.
+        /// </summary>
+        /// <param name="nodeBaseTypeName"> The assembly qualified name of the common base type of all nodes belonging to a graph. </param>
+        /// <returns> A list of metadata tuples corresponding to each node search entry. </returns>
+        /// TODO: Consider using lists from ListPool to avoid allocations and maybe exposing the search entry type.
+        public static List<(Type type, string title, string[] path)> GetNodeSearchEntries(string nodeBaseTypeName)
         {
-            var nodeBaseType = Type.GetType(graph.NodesBaseType);
+            var nodeBaseType = Type.GetType(nodeBaseTypeName);
             if (!IsSubclassOfNode(nodeBaseType))
             {
                 Debug.LogErrorFormat(k_NotSubTypeOfScriptableNode, nodeBaseType?.FullName);
@@ -94,6 +100,29 @@ namespace GiftHorse.ScriptableGraphs
                 .ToList();
         }
 
+        /// <summary>
+        /// Checks if the node type should be excluded from the search window base on its <see cref="NodeScriptAttribute"/>.
+        /// </summary>
+        /// <param name="nodeType"> The type of the node. </param>
+        /// <returns> Whether the node type should be excluded or not. </returns>
+        public static bool IsNodeExcludedFromSearch(Type nodeType)
+        {
+            if (!IsSubclassOfNode(nodeType))
+            {
+                Debug.LogErrorFormat(k_NotSubTypeOfScriptableNode, nodeType.FullName);
+                return false;
+            }
+
+            var nodeScriptAttribute = nodeType.GetCustomAttribute<NodeScriptAttribute>();
+            return nodeScriptAttribute?.ExcludeFromSearch ?? false;
+        }
+
+        /// <summary>
+        /// Trys to get the header color of a node based on its <see cref="HeaderColorAttribute"/>.
+        /// </summary>
+        /// <param name="nodeType"> The type of the node. </param>
+        /// <param name="color"> Out parameter containing the specified color if set, otherwise has default value. </param>
+        /// <returns> Whether a header color was set or not. </returns>
         public static bool TryGetNodeHeaderColor(Type nodeType, out Color color)
         {
             if (!nodeType.IsSubclassOf(typeof(ScriptableNode)))
@@ -115,6 +144,11 @@ namespace GiftHorse.ScriptableGraphs
             return true;
         }
 
+        /// <summary>
+        /// Gets all the exposed fields of a node.
+        /// </summary>
+        /// <param name="type"> The type of the node whose fields are being fetched. </param>
+        /// <returns> A list of the names of all exposed fields. </returns>
         public static IEnumerable<string> GetNodeExposedFieldsNames(Type type)
         {
             if (!IsSubclassOfNode(type))

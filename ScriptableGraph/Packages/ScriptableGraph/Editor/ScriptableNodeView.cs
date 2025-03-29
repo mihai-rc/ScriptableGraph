@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace GiftHorse.ScriptableGraphs.Editor
 {
+    /// <summary>
+    /// <see cref="Node"/> class used to display a <see cref="ScriptableNode"/> in the graph editor.
+    /// </summary>
     public class ScriptableNodeView : Node
     {
         private const string k_PropertiesHolderName = "PropertiesHolder";
@@ -22,11 +25,27 @@ namespace GiftHorse.ScriptableGraphs.Editor
         private SerializedProperty m_SerializedProperty;
         private VisualElement m_PropertiesHolder;
         
+        /// <summary>
+        /// Reference to the <see cref="ScriptableNode"/> this view is handling.
+        /// </summary>
         public ScriptableNode ScriptableNode => m_ScriptableNode;
 
+        /// <summary>
+        /// List of all <see cref="InPort"/>s of this node.
+        /// </summary>
         public List<Port> InPorts { get; } = new();
+        
+        /// <summary>
+        /// List of all <see cref="OutPort"/>s of this node.
+        /// </summary>
         public List<Port> OutPorts { get; } = new();
 
+        /// <summary>
+        /// <see cref="ScriptableNodeView"/>'s constructor.
+        /// </summary>
+        /// <param name="scriptableNode"> Reference to the <see cref="ScriptableNode"/> this view is handling. </param>
+        /// <param name="context"> Reference to the <see cref="SearchWindowContext"/> to access relevant dependencies. </param>
+        /// <param name="isDeletable"> Flag representing whether the user can or cannot delete the node from the <see cref="ScriptableGraphView"/>. </param>
         public ScriptableNodeView(ScriptableNode scriptableNode, ScriptableGraphEditorContext context, bool isDeletable)
         {
             m_ScriptableNode = scriptableNode;
@@ -41,6 +60,9 @@ namespace GiftHorse.ScriptableGraphs.Editor
             InitializeNodeByReflection();
         }
         
+        /// <summary>
+        /// Saves the position of this node after the node was moved in the editor and the user saves.
+        /// </summary>
         public void SavePosition()
         {
             ScriptableNode.Position = GetPosition();

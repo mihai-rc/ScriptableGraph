@@ -1,6 +1,6 @@
 {
   "name": "com.gift-horse.scriptable-graph",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "displayName": "Scriptable Graph",
   "description": "Graph data structure that maintains script nodes and serializes them into Unity Scenes.",
   "unity": "2022.3",

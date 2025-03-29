@@ -8,6 +8,9 @@ using UnityEngine.UIElements;
 
 namespace GiftHorse.ScriptableGraphs.Editor
 {
+    /// <summary>
+    /// <see cref="GraphView"/> class used to display the <see cref="ScriptableGraph"/> in the editor.
+    /// </summary>
     public class ScriptableGraphView : GraphView
     {
         private const string k_UssFilePath = "Packages/com.gift-horse.scriptable-graph/Editor/Uss/ScriptableGraphView.uss";
@@ -23,6 +26,10 @@ namespace GiftHorse.ScriptableGraphs.Editor
         private readonly List<Edge> m_EdgeViews = new();
         private readonly Dictionary<string, ScriptableNodeView> m_NodeViewsByNodeId = new();
 
+        /// <summary>
+        /// <see cref="ScriptableGraphView"/>'s constructor.
+        /// </summary>
+        /// <param name="context"> Reference to the <see cref="SearchWindowContext"/> to access relevant dependencies and draw the graph. </param>
         public ScriptableGraphView(ScriptableGraphEditorContext context)
         {
             m_Context = context;
@@ -45,6 +52,7 @@ namespace GiftHorse.ScriptableGraphs.Editor
             Undo.undoRedoPerformed -= OnUndoRedoPerformed;
         }
 
+        /// <inheritdoc />
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
         {
             var allPorts = new List<Port>();
@@ -68,6 +76,10 @@ namespace GiftHorse.ScriptableGraphs.Editor
             return compatiblePorts;
         }
 
+        /// <summary>
+        /// Adds a <see cref="ScriptableNode"/> to the graph data structure when an entry is selected from <see cref="NodeSearchWindow"/>.
+        /// </summary>
+        /// <param name="scriptableNode"> Reference to the newly created node. </param>
         public void Add(ScriptableNode scriptableNode)
         {
             Undo.RecordObject(m_Context.SerializedObject.targetObject, k_AddNodeUndoRecord);
