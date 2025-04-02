@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace GiftHorse.ScriptableGraphs
+namespace GiftHorse.SerializedGraphs
 {
     /// <summary>
     /// Data about an output port.

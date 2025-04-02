@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace GiftHorse.ScriptableGraphs.Attributes
+namespace GiftHorse.SerializedGraphs.Attributes
 {
     /// <summary>
     /// Attribute class used to specify the color of the node view header.

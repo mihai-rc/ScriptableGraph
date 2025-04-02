@@ -1,8 +1,8 @@
-using GiftHorse.ScriptableGraphs;
+using GiftHorse.SerializedGraphs;
 
 namespace Calculator
 {
-    public abstract class CalculatorNode : ScriptableNode
+    public abstract class CalculatorNode : SerializedNodeBase
     {
     }    
 }

@@ -7,7 +7,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using UnityEngine.Pool;
 
-namespace GiftHorse.ScriptableGraphs.Editor
+namespace GiftHorse.SerializedGraphs.Editor
 {
     /// <summary>
     /// Node search window for creating new nodes in the graph editor.
@@ -26,7 +26,7 @@ namespace GiftHorse.ScriptableGraphs.Editor
 
         private ScriptableGraphWindow m_Window;
         private ScriptableGraphView m_GraphView;
-        private ScriptableGraph m_ScriptableGraph;
+        private SerializedGraphBase m_Graph;
 
         /// <summary>
         /// Initializes the search window with the context of the graph editor.
@@ -36,14 +36,14 @@ namespace GiftHorse.ScriptableGraphs.Editor
         {
             m_Window = context.Window;
             m_GraphView = context.GraphView;
-            m_ScriptableGraph = context.Graph;
+            m_Graph = context.Graph;
         }
 
         /// <inheritdoc />
         public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context)
         {
             var elements = ReflectionHelper
-                .GetNodeSearchEntries(m_ScriptableGraph.NodesBaseType)
+                .GetNodeSearchEntries(m_Graph.NodesBaseType)
                 .Select(e => new SearchElement
                 {
                     Type = e.type,
@@ -66,7 +66,7 @@ namespace GiftHorse.ScriptableGraphs.Editor
             if (searchTreeEntry.userData is not Type type) 
                 return false;
 
-            if (Activator.CreateInstance(type) is not ScriptableNode node) 
+            if (Activator.CreateInstance(type) is not SerializedNodeBase node) 
                 return false;
 
             node.Position = new Rect(graphMousePosition, new Vector2());

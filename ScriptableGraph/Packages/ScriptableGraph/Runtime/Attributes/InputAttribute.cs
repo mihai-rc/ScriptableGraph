@@ -1,6 +1,6 @@
 using System;
 
-namespace GiftHorse.ScriptableGraphs.Attributes
+namespace GiftHorse.SerializedGraphs.Attributes
 {
     /// <summary>
     /// Attribute class used to declare an input port.

@@ -1,4 +1,4 @@
-using GiftHorse.ScriptableGraphs.Attributes;
+using GiftHorse.SerializedGraphs.Attributes;
 
 namespace Calculator
 {

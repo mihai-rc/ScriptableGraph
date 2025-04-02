@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace GiftHorse.ScriptableGraphs
+namespace GiftHorse.SerializedGraphs
 {
     /// <summary>
     /// Data about an input port.

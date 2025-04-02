@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using UnityEngine;
 
-namespace GiftHorse.ScriptableGraphs
+namespace GiftHorse.SerializedGraphs
 {
     /// <summary>
     /// Data about a connection between two ports. 
@@ -11,7 +11,7 @@ namespace GiftHorse.ScriptableGraphs
     [Serializable]
     public class Connection
     {
-        private const string k_FieldsCouldNotBeFound = "The field {0} of the associated port cannot be found!";
+        private const string k_FieldsCouldNotBeFound = "[SerializedGraph] The field {0} of the associated port cannot be found!";
         
         [SerializeField] private string m_Id;
 
@@ -39,7 +39,7 @@ namespace GiftHorse.ScriptableGraphs
         /// <see cref="Connection"/> constructor.
         /// </summary>
         /// <param name="fromPort"> The <see cref="OutPort"/> this connection is taking its value from. </param>
-        /// <param name="toPort"> The <see cref="InPort"/>this connection is giving its value to. </param>
+        /// <param name="toPort"> The <see cref="InPort"/> this connection is giving its value to. </param>
         public Connection(OutPort fromPort, InPort toPort)
         {
             m_Id = Guid.NewGuid().ToString();
@@ -51,16 +51,16 @@ namespace GiftHorse.ScriptableGraphs
         /// Initializes the connection.
         /// </summary>
         /// <param name="nodesById"> Dictionary of the nodes mapped to their ids. </param>
-        public void Init(Dictionary<string, ScriptableNode> nodesById) => m_TransferValueFn = CreateTransferValueDelegate(nodesById);
+        public void Init(Dictionary<string, ISerializedNode> nodesById) => m_TransferValueFn = CreateTransferValueDelegate(nodesById);
         
         /// <summary>
-        /// Transfer the value from the emitting output field into the receiving input field.
+        /// Transfers the value from the emitting output field into the receiving input field.
         /// </summary>
         public void TransferValue() => m_TransferValueFn?.Invoke();
 
         /// <summary>
-        /// Uses a simple expression tree to create a delegate that capture the fields
-        /// corresponding to the connected ports and assign the output to the input.
+        /// Uses a simple expression tree to create a delegate that captures the fields
+        /// corresponding to the connected ports and assigns the output to the input.
         /// </summary>
         /// <param name="nodesById">
         /// Dictionary of the nodes mapped to their ids.
@@ -70,11 +70,11 @@ namespace GiftHorse.ScriptableGraphs
         /// node to the output field of the emitting node.
         /// </returns>
         /// <remarks>
-        /// In order for this to work, the fields of the nodes must be public and the <see cref="ScriptableGraph.ScriptableNodes"/>
-        /// should be kept sorted by their Depth Level so that the output field is always assigned before the input field.
-        /// TODO: Make sure that this approach works well Apple policies. If not, change the solution to use code generation to achieve the same result.
+        /// In order for this to work, the fields of the nodes must be public and the <see cref="SerializedGraphBase.Nodes"/>
+        /// should be kept sorted by their Depth Level thus the output field is always assigned before the input field.
+        /// TODO: Make sure that this approach works well with Apple policies. If not, change the solution to use code generation to achieve the same result.
         /// </remarks>
-        private Action CreateTransferValueDelegate(Dictionary<string, ScriptableNode> nodesById)
+        private Action CreateTransferValueDelegate(Dictionary<string, ISerializedNode> nodesById)
         {
             var fromNode = nodesById[m_FromPort.NodeId];
             var toNode = nodesById[m_ToPort.NodeId];

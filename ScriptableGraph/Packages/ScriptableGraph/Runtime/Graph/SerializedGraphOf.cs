@@ -1,21 +1,14 @@
-using System.Collections.Generic;
-using System.Linq;
-
-namespace GiftHorse.ScriptableGraphs
+namespace GiftHorse.SerializedGraphs
 {
     /// <inheritdoc />
-    public class ScriptableGraphOf<TNode> : ScriptableGraph where TNode : ScriptableNode
+    public class SerializedGraphOf<TNode> : SerializedGraphBase 
+        where TNode : class, ISerializedNode
     {
         /// <inheritdoc />
         public override string NodesBaseType => typeof(TNode).AssemblyQualifiedName;
 
         /// <summary>
-        /// Collection of all nodes.
-        /// </summary>
-        public IEnumerable<TNode> Nodes => ScriptableNodes.Select(node => node as TNode);
-
-        /// <summary>
-        /// It is called when a connection is created.
+        /// Callback called when a connection is created.
         /// </summary>
         /// <param name="fromNode"> Reference to the node the connection starts from. </param>
         /// <param name="fromPort"> The <see cref="OutPort"/> the connection starts from. </param>
@@ -24,7 +17,7 @@ namespace GiftHorse.ScriptableGraphs
         protected virtual void OnConnect(TNode fromNode, OutPort fromPort, TNode toNode, InPort toPort) { }
 
         /// <summary>
-        /// It is called when a connection is removed.
+        /// Callback called when a connection is removed.
         /// </summary>
         /// <param name="fromNode"> Reference to the node the connection starts from. </param>
         /// <param name="fromPort"> The <see cref="OutPort"/> the connection starts from. </param>
@@ -33,13 +26,13 @@ namespace GiftHorse.ScriptableGraphs
         protected virtual void OnDisconnect(TNode fromNode, OutPort fromPort, TNode toNode, InPort toPort) { }
 
         /// <inheritdoc />
-        protected override void OnConnectionCreated(ScriptableNode fromNode, OutPort fromPort, ScriptableNode toNode, InPort toPort)
+        protected override void OnConnectionCreated(ISerializedNode fromNode, OutPort fromPort, ISerializedNode toNode, InPort toPort)
         {
             OnConnect(fromNode as TNode, fromPort, toNode as TNode, toPort);
         }
 
         /// <inheritdoc />
-        protected override void OnConnectionRemoved(ScriptableNode fromNode, OutPort fromPort, ScriptableNode toNode, InPort toPort)
+        protected override void OnConnectionRemoved(ISerializedNode fromNode, OutPort fromPort, ISerializedNode toNode, InPort toPort)
         {
             OnDisconnect(fromNode as TNode, fromPort, toNode as TNode, toPort);
         }

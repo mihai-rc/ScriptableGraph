@@ -2,22 +2,22 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace GiftHorse.ScriptableGraphs.Editor
+namespace GiftHorse.SerializedGraphs.Editor
 {
     public class ScriptableGraphEditorContext
     {
         /// <summary>
         /// Reference to the graph component.
         /// </summary>
-        public ScriptableGraph Graph { get; private set; }
+        public SerializedGraphBase Graph { get; private set; }
         
         /// <summary>
-        /// The <see cref="ScriptableGraphView"/> that edits the <see cref="ScriptableGraph"/>.
+        /// The <see cref="ScriptableGraphView"/> that edits the <see cref="SerializedGraphBase"/>.
         /// </summary>
         public ScriptableGraphView GraphView { get; private set; }
         
         /// <summary>
-        /// The serialized object of the <see cref="ScriptableGraph"/>.
+        /// The serialized object of the <see cref="SerializedGraphBase"/>.
         /// </summary>
         public SerializedObject SerializedObject { get; private set; }
         
@@ -38,7 +38,7 @@ namespace GiftHorse.ScriptableGraphs.Editor
         /// </summary>
         /// <param name="graph"> Reference to the graph component. </param>
         /// <param name="window"> The editor window that contains the <see cref="ScriptableGraphView"/>. </param>
-        public ScriptableGraphEditorContext(ScriptableGraph graph, ScriptableGraphWindow window)
+        public ScriptableGraphEditorContext(SerializedGraphBase graph, ScriptableGraphWindow window)
         {
             Graph = graph;
             Window = window;

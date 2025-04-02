@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace GiftHorse.ScriptableGraphs
+namespace GiftHorse.SerializedGraphs
 {
     /// <summary>
     /// Common data about a port.

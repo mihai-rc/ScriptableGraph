@@ -1,8 +1,8 @@
-using GiftHorse.ScriptableGraphs;
+using GiftHorse.SerializedGraphs;
 
 namespace Calculator
 {
-    public class CalculatorGraph : ScriptableGraphOf<CalculatorNode>
+    public class CalculatorGraph : SerializedGraphOf<CalculatorNode>
     {
     }
 }

@@ -3,7 +3,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace GiftHorse.ScriptableGraphs.Editor
+namespace GiftHorse.SerializedGraphs.Editor
 {
     /// <summary>
     /// <see cref="EditorWindow"/> class used to display a <see cref="ScriptableGraphView"/> in the editor.
@@ -11,13 +11,13 @@ namespace GiftHorse.ScriptableGraphs.Editor
     public class ScriptableGraphWindow : EditorWindow
     {
         private const string k_WindowIcon = "d_SceneViewTools";
-        private const string k_ComponentNotFound = "[Editor] [ScriptableGraph] ScriptableGraph component couldn't be found at the cached path: {0}.";
+        private const string k_ComponentNotFound = "[Editor] [SerializedGraph] SerializedGraph component couldn't be found at the cached path: {0}.";
 
         /// <summary>
-        /// Opens a <see cref="ScriptableGraphWindow"/> for the given <see cref="ScriptableGraph"/>.
+        /// Opens a <see cref="ScriptableGraphWindow"/> for the given <see cref="SerializedGraphBase"/>.
         /// </summary>
         /// <param name="sceneAsset"> Reference to the graph component the window will edit. </param>
-        public static void Open(ScriptableGraph sceneAsset)
+        public static void Open(SerializedGraphBase sceneAsset)
         {
             var windows = Resources.FindObjectsOfTypeAll<ScriptableGraphWindow>();
             foreach (var window in windows)
@@ -42,22 +42,22 @@ namespace GiftHorse.ScriptableGraphs.Editor
         private Scene m_Scene;
 
         /// <summary>
-        /// Tries to find the <see cref="ScriptableGraph"/> component in the active scene from the cached path.
+        /// Tries to find the <see cref="SerializedGraphBase"/> component in the active scene from the cached path.
         /// </summary>
-        /// <param name="graph"> The reference to the <see cref="ScriptableGraph"/> if found, otherwise is null. </param>
-        /// <returns> Returns whether the <see cref="ScriptableGraph"/> was found or not. </returns>
-        public bool TryGetScriptableGraph(out ScriptableGraph graph)
+        /// <param name="graph"> The reference to the <see cref="SerializedGraphBase"/> if found, otherwise is null. </param>
+        /// <returns> Returns whether the <see cref="SerializedGraphBase"/> was found or not. </returns>
+        public bool TryGetScriptableGraph(out SerializedGraphBase graph)
         {
             graph = null;
             if (string.IsNullOrEmpty(m_GraphHierarchyPath)) 
                 return false;
 
             // This way we can keep the window open between editor sessions but this method
-            // only works if the owner GameObject has only one ScriptableGraph component attached.
+            // only works if the owner GameObject has only one SerializedGraphBase component attached.
 
             graph = GameObject
                 .Find(m_GraphHierarchyPath)
-                .GetComponent<ScriptableGraph>();
+                .GetComponent<SerializedGraphBase>();
 
             return true;
         }
@@ -87,17 +87,17 @@ namespace GiftHorse.ScriptableGraphs.Editor
             hasUnsavedChanges = m_Context.HasUnsavedChanges;
         }
 
-        private void Load(ScriptableGraph scriptableGraph)
+        private void Load(SerializedGraphBase graph)
         {
-            m_GraphHierarchyPath = GetHierarchyPath(scriptableGraph);
+            m_GraphHierarchyPath = GetHierarchyPath(graph);
             EditorSceneManager.activeSceneChangedInEditMode += OnSceneChanged;
             
-            CreateGraph(scriptableGraph);
+            CreateGraph(graph);
         }
 
-        private void CreateGraph(ScriptableGraph scriptableGraph)
+        private void CreateGraph(SerializedGraphBase graph)
         {
-            m_Context = new ScriptableGraphEditorContext(scriptableGraph, this);
+            m_Context = new ScriptableGraphEditorContext(graph, this);
             m_Context.DrawGraphView();
         }
 

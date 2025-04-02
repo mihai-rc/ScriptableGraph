@@ -4,18 +4,18 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using GiftHorse.ScriptableGraphs.Attributes;
+using GiftHorse.SerializedGraphs.Attributes;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace GiftHorse.ScriptableGraphs
+namespace GiftHorse.SerializedGraphs
 {
     public static class ReflectionHelper
     {
         private const BindingFlags k_BindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-        private const string k_NotSubTypeOfScriptableNode = "[ScriptableGraph] Cannot process type: {0} because it is not a subtype of ScriptableNode!";
+        private const string k_NotSubTypeOfScriptableNode = "[SerializedGraph] Cannot process type: {0} because it is not a subtype of SerializedNode!";
         
         /// <summary>
         /// Gets the title of the node based on its type.
@@ -25,10 +25,7 @@ namespace GiftHorse.ScriptableGraphs
         public static string GetNodeTitleByType(Type nodeType)
         {
             if (!IsSubclassOfNode(nodeType))
-            {
-                Debug.LogErrorFormat(k_NotSubTypeOfScriptableNode, nodeType.FullName);
                 return null;
-            }
 
             return BeautifyTitle(nodeType.Name);
         }
@@ -40,7 +37,7 @@ namespace GiftHorse.ScriptableGraphs
         /// <param name="inPorts"> Out reference of the list containing all the input ports. </param>
         /// <param name="outPorts"> Out reference of the list containing all the output ports. </param>
         /// TODO: Consider using lists from ListPool to avoid allocations.
-        public static void GetNodePorts(ScriptableNode node, out List<InPort> inPorts, out List<OutPort> outPorts)
+        public static void GetNodePorts(SerializedNodeBase node, out List<InPort> inPorts, out List<OutPort> outPorts)
         {
             var type = node.GetType();
             var fields = type
@@ -63,7 +60,7 @@ namespace GiftHorse.ScriptableGraphs
         
         private static bool IsSubclassOfNode(Type type)
         {
-            if (type.IsSubclassOf(typeof(ScriptableNode))) 
+            if (type.IsSubclassOf(typeof(SerializedNodeBase))) 
                 return true;
 
             Debug.LogErrorFormat(k_NotSubTypeOfScriptableNode, type.FullName);
@@ -86,11 +83,9 @@ namespace GiftHorse.ScriptableGraphs
         public static List<(Type type, string title, string[] path)> GetNodeSearchEntries(string nodeBaseTypeName)
         {
             var nodeBaseType = Type.GetType(nodeBaseTypeName);
+
             if (!IsSubclassOfNode(nodeBaseType))
-            {
-                Debug.LogErrorFormat(k_NotSubTypeOfScriptableNode, nodeBaseType?.FullName);
                 return null;
-            }
 
             return TypeCache
                 .GetTypesDerivedFrom(nodeBaseType)
@@ -108,10 +103,7 @@ namespace GiftHorse.ScriptableGraphs
         public static bool IsNodeExcludedFromSearch(Type nodeType)
         {
             if (!IsSubclassOfNode(nodeType))
-            {
-                Debug.LogErrorFormat(k_NotSubTypeOfScriptableNode, nodeType.FullName);
                 return false;
-            }
 
             var nodeScriptAttribute = nodeType.GetCustomAttribute<NodeScriptAttribute>();
             return nodeScriptAttribute?.ExcludeFromSearch ?? false;
@@ -125,10 +117,8 @@ namespace GiftHorse.ScriptableGraphs
         /// <returns> Whether a header color was set or not. </returns>
         public static bool TryGetNodeHeaderColor(Type nodeType, out Color color)
         {
-            if (!nodeType.IsSubclassOf(typeof(ScriptableNode)))
+            if (!IsSubclassOfNode(nodeType))
             {
-                Debug.LogErrorFormat(k_NotSubTypeOfScriptableNode, nodeType.FullName);
-
                 color = default;
                 return false;
             }
@@ -152,9 +142,7 @@ namespace GiftHorse.ScriptableGraphs
         public static IEnumerable<string> GetNodeExposedFieldsNames(Type type)
         {
             if (!IsSubclassOfNode(type))
-            {
                 return Enumerable.Empty<string>();
-            }
 
             return type
                 .GetFields(k_BindingFlags)

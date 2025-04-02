@@ -1,6 +1,6 @@
 using System;
 
-namespace GiftHorse.ScriptableGraphs.Attributes
+namespace GiftHorse.SerializedGraphs.Attributes
 {
     /// <summary>
     /// Attribute class used to specify the node's type path.

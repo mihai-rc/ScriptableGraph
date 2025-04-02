@@ -6,15 +6,15 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiftHorse.ScriptableGraphs.Editor
+namespace GiftHorse.SerializedGraphs.Editor
 {
     /// <summary>
-    /// <see cref="GraphView"/> class used to display the <see cref="ScriptableGraph"/> in the editor.
+    /// <see cref="GraphView"/> class used to display the <see cref="SerializedGraphBase"/> in the editor.
     /// </summary>
     public class ScriptableGraphView : GraphView
     {
         private const string k_UssFilePath = "Packages/com.gift-horse.scriptable-graph/Editor/Uss/ScriptableGraphView.uss";
-        private const string k_UssFileNotFoundError = "[Editor] [ScriptableGraph] No uss file was found at: {0}.";
+        private const string k_UssFileNotFoundError = "[Editor] [SerializedGraph] No uss file was found at: {0}.";
         private const string k_BackgroundName = "Background";
         private const string k_AddNodeUndoRecord = "Added Graph Node";
         private const string k_AddConnectionUndoRecord = "Added Graph Connections";
@@ -77,17 +77,17 @@ namespace GiftHorse.ScriptableGraphs.Editor
         }
 
         /// <summary>
-        /// Adds a <see cref="ScriptableNode"/> to the graph data structure when an entry is selected from <see cref="NodeSearchWindow"/>.
+        /// Adds a <see cref="ISerializedNode"/> to the graph data structure when an entry is selected from <see cref="NodeSearchWindow"/>.
         /// </summary>
-        /// <param name="scriptableNode"> Reference to the newly created node. </param>
-        public void Add(ScriptableNode scriptableNode)
+        /// <param name="node"> Reference to the newly created node. </param>
+        public void Add(ISerializedNode node)
         {
             Undo.RecordObject(m_Context.SerializedObject.targetObject, k_AddNodeUndoRecord);
 
-            m_Context.Graph.AddNode(scriptableNode);
+            m_Context.Graph.AddNode(node);
             m_Context.SerializedObject.Update();
 
-            AddNodeToGraph(scriptableNode);
+            AddNodeToGraph(node);
             this.Bind(m_Context.SerializedObject);
         }
 
@@ -118,7 +118,7 @@ namespace GiftHorse.ScriptableGraphs.Editor
 
         private void DrawNodes()
         {
-            foreach (var node in m_Context.Graph.ScriptableNodes)
+            foreach (var node in m_Context.Graph.Nodes)
                 AddNodeToGraph(node);
 
             this.Bind(m_Context.SerializedObject);
@@ -152,7 +152,7 @@ namespace GiftHorse.ScriptableGraphs.Editor
         private void UpdateExpandedNodes()
         {
             foreach (var node in m_NodeViews)
-                node.expanded = node.ScriptableNode.Expanded;
+                node.expanded = node.SerializedNodeBase.Expanded;
         }
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
@@ -204,24 +204,24 @@ namespace GiftHorse.ScriptableGraphs.Editor
             DrawConnections();
         }
 
-        private void AddNodeToGraph(ScriptableNode scriptableNode)
+        private void AddNodeToGraph(ISerializedNode node)
         {
-            var isSearchableNode = ReflectionHelper.IsNodeExcludedFromSearch(scriptableNode.GetType());
-            var nodeView = new ScriptableNodeView(scriptableNode, m_Context, !isSearchableNode);
-            nodeView.SetPosition(scriptableNode.Position);
+            var isSearchableNode = ReflectionHelper.IsNodeExcludedFromSearch(node.GetType());
+            var nodeView = new ScriptableNodeView(node, m_Context, !isSearchableNode);
+            nodeView.SetPosition(node.Position);
 
             m_NodeViews.Add(nodeView);
-            m_NodeViewsByNodeId.Add(scriptableNode.Id, nodeView);
+            m_NodeViewsByNodeId.Add(node.Id, nodeView);
 
             AddElement(nodeView);
         }
 
         private void RemoveNodeFromGraph(ScriptableNodeView nodeView)
         {
-            m_Context.Graph.RemoveNode(nodeView.ScriptableNode);
+            m_Context.Graph.RemoveNode(nodeView.SerializedNodeBase);
             m_Context.SerializedObject.Update();
 
-            m_NodeViewsByNodeId.Remove(nodeView.ScriptableNode.Id);
+            m_NodeViewsByNodeId.Remove(nodeView.SerializedNodeBase.Id);
             m_NodeViews.Remove(nodeView);
         }
 
@@ -229,11 +229,11 @@ namespace GiftHorse.ScriptableGraphs.Editor
         {
             var toNodeView = edge.input.node as ScriptableNodeView;
             var toIndex = toNodeView.InPorts.IndexOf(edge.input);
-            var toNode = toNodeView.ScriptableNode;
+            var toNode = toNodeView.SerializedNodeBase;
 
             var fromNodeView = edge.output.node as ScriptableNodeView;
             var fromIndex = fromNodeView.OutPorts.IndexOf(edge.output);
-            var fromNode = fromNodeView.ScriptableNode;
+            var fromNode = fromNodeView.SerializedNodeBase;
 
             m_EdgeViews.Add(edge);
             m_Context.Graph.ConnectNodes(fromNode, fromIndex, toNode, toIndex);
@@ -243,11 +243,11 @@ namespace GiftHorse.ScriptableGraphs.Editor
         {
             var toNodeView = edge.input.node as ScriptableNodeView;
             var toIndex = toNodeView.InPorts.IndexOf(edge.input);
-            var toNode = toNodeView.ScriptableNode;
+            var toNode = toNodeView.SerializedNodeBase;
 
             var fromNodeView = edge.output.node as ScriptableNodeView;
             var fromIndex = fromNodeView.OutPorts.IndexOf(edge.output);
-            var fromNode = fromNodeView.ScriptableNode;
+            var fromNode = fromNodeView.SerializedNodeBase;
 
             m_Context.Graph.DisconnectNodes(fromNode, fromIndex, toNode, toIndex);
         }
