@@ -15,7 +15,7 @@ namespace GiftHorse.SerializedGraphs
     public static class ReflectionHelper
     {
         private const BindingFlags k_BindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-        private const string k_NotSubTypeOfScriptableNode = "[SerializedGraph] Cannot process type: {0} because it is not a subtype of SerializedNode!";
+        private const string k_NotSubTypeOfSerializedNode = "[SerializedGraph] Cannot process type: {0} because it is not a subtype of SerializedNode!";
         
         /// <summary>
         /// Gets the title of the node based on its type.
@@ -63,7 +63,7 @@ namespace GiftHorse.SerializedGraphs
             if (type.IsSubclassOf(typeof(SerializedNodeBase))) 
                 return true;
 
-            Debug.LogErrorFormat(k_NotSubTypeOfScriptableNode, type.FullName);
+            Debug.LogErrorFormat(k_NotSubTypeOfSerializedNode, type.FullName);
             return false;
         }
 
@@ -96,7 +96,7 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <summary>
-        /// Checks if the node type should be excluded from the search window base on its <see cref="NodeScriptAttribute"/>.
+        /// Checks if the node type should be excluded from the search window based on its <see cref="NodeScriptAttribute"/>.
         /// </summary>
         /// <param name="nodeType"> The type of the node. </param>
         /// <returns> Whether the node type should be excluded or not. </returns>

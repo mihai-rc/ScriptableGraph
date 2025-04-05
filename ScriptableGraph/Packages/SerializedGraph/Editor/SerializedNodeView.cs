@@ -11,42 +11,42 @@ namespace GiftHorse.SerializedGraphs.Editor
     /// <summary>
     /// <see cref="Node"/> class used to display a <see cref="ISerializedNode"/> in the graph editor.
     /// </summary>
-    public class ScriptableNodeView : Node
+    public class SerializedNodeView : Node
     {
         private const string k_PropertiesHolderName = "PropertiesHolder";
         private const string k_PropertyFieldName = "PropertyField";
         private const string k_IdProperty = "m_Id";
         private const string k_NodesProperty = "m_Nodes";
-        private const string k_SerializedPropertyNotFoundError = "[Editor] [SerializedGraph] Could not find the SerializedProperty of ScriptableGraphNode: {0}, Id: {1}.";
+        private const string k_SerializedPropertyNotFoundError = "[Editor] [SerializedGraph] Could not find the SerializedProperty of ISerializedNode: {0}, Id: {1}.";
         private const string k_InvalidNodeProperty = "[Editor] [SerializedGraph] Could not find the relative property by name: {0}. Make sure you use [NodeField] attribute only with serialized types.";
         
         private readonly ISerializedNode m_SerializedNode;
-        private readonly ScriptableGraphEditorContext m_Context;
+        private readonly SerializedGraphEditorContext m_Context;
         private SerializedProperty m_SerializedProperty;
         private VisualElement m_PropertiesHolder;
         
         /// <summary>
         /// Reference to the <see cref="ISerializedNode"/> this view is handling.
         /// </summary>
-        public ISerializedNode SerializedNodeBase => m_SerializedNode;
+        public ISerializedNode SerializedNode => m_SerializedNode;
 
         /// <summary>
-        /// List of all <see cref="InPort"/>s of this node.
+        /// List of all <see cref="InPort"/> views of this node.
         /// </summary>
         public List<Port> InPorts { get; } = new();
         
         /// <summary>
-        /// List of all <see cref="OutPort"/>s of this node.
+        /// List of all <see cref="OutPort"/> views of this node.
         /// </summary>
         public List<Port> OutPorts { get; } = new();
 
         /// <summary>
-        /// <see cref="ScriptableNodeView"/>'s constructor.
+        /// <see cref="SerializedNodeView"/>'s constructor.
         /// </summary>
         /// <param name="node"> Reference to the <see cref="ISerializedNode"/> this view is handling. </param>
         /// <param name="context"> Reference to the <see cref="SearchWindowContext"/> to access relevant dependencies. </param>
-        /// <param name="isDeletable"> Flag representing whether the user can or cannot delete the node from the <see cref="ScriptableGraphView"/>. </param>
-        public ScriptableNodeView(ISerializedNode node, ScriptableGraphEditorContext context, bool isDeletable)
+        /// <param name="isDeletable"> Flag representing whether the user can or cannot delete the <see cref="ISerializedNode"/> from the <see cref="SerializedGraphView"/>. </param>
+        public SerializedNodeView(ISerializedNode node, SerializedGraphEditorContext context, bool isDeletable)
         {
             m_SerializedNode = node;
             m_Context = context;
@@ -65,7 +65,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// </summary>
         public void SavePosition()
         {
-            SerializedNodeBase.Position = GetPosition();
+            m_SerializedNode.Position = GetPosition();
         }
 
         protected override void ToggleCollapse()
@@ -101,7 +101,7 @@ namespace GiftHorse.SerializedGraphs.Editor
                 var element = nodes.GetArrayElementAtIndex(i);
                 var elementId = element.FindPropertyRelative(k_IdProperty);
                     
-                if (!elementId.stringValue.Equals(SerializedNodeBase.Id)) 
+                if (!elementId.stringValue.Equals(m_SerializedNode.Id)) 
                     continue;
                     
                 return element;
@@ -113,8 +113,8 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private void SetupNodeHeaderByReflection(Type type)
         {
-            name = SerializedNodeBase.Title;
-            title = SerializedNodeBase.Title;
+            name = m_SerializedNode.Title;
+            title = m_SerializedNode.Title;
             
             if (!ReflectionHelper.TryGetNodeHeaderColor(type, out var color)) 
                 return;
@@ -125,7 +125,7 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private void InitializeNodeByReflection()
         {
-            var type = SerializedNodeBase.GetType();
+            var type = m_SerializedNode.GetType();
             SetupNodeHeaderByReflection(type);
             GetNodePropertiesByReflection(type);
         }
@@ -133,28 +133,20 @@ namespace GiftHorse.SerializedGraphs.Editor
         private void CreateInputs()
         {
             foreach (var inPort in m_SerializedNode.InPorts)
-            {
                 CreateInputPort(inPort.Name, Type.GetType(inPort.CompatibleType), false);
-            }
         }
         
         private void CreateOutputs()
         {
             foreach (var outPort in m_SerializedNode.OutPorts)
-            {
                 CreateOutputPort(outPort.Name, Type.GetType(outPort.CompatibleType), true);
-            }
         }
 
         private void GetNodePropertiesByReflection(Type type)
         {
             foreach (var propertyName in ReflectionHelper.GetNodeExposedFieldsNames(type))
             {
-                if (m_PropertiesHolder is null)
-                {
-                    m_PropertiesHolder = InitializePropertiesHolder();
-                }
-                
+                m_PropertiesHolder ??= InitializePropertiesHolder();
                 DrawProperty(propertyName);
             }
             
@@ -184,10 +176,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         
         private void DrawProperty(string propertyName)
         {
-            if (m_SerializedProperty is null)
-            {
-                m_SerializedProperty = InitializeSerializedProperty();
-            }
+            m_SerializedProperty ??= InitializeSerializedProperty();
 
             var property = m_SerializedProperty.FindPropertyRelative(propertyName);
             if (property is null)

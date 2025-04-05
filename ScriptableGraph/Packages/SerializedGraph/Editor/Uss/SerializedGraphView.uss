@@ -1,4 +1,4 @@
-ScriptableGraphView 
+SerializedGraphView 
 {
     flex-grow: 1;
 }

@@ -13,7 +13,7 @@ namespace GiftHorse.SerializedGraphs
         private string m_ConnectionId;
 
         /// <summary>
-        /// The id of the connection this port is linked to.
+        /// The id of the <see cref="Connection"/> this port is linked to.
         /// </summary>
         public string ConnectionId
         {
@@ -28,8 +28,8 @@ namespace GiftHorse.SerializedGraphs
         /// <see cref="InPort"/> constructor.
         /// </summary>
         /// <param name="name"> The name of the port. </param>
-        /// <param name="nodeId"> The id of the node this port belongs to. </param>
-        /// <param name="index"> The index of the port in node's input ports list. </param>
+        /// <param name="nodeId"> The id of the <see cref="ISerializedNode"/> this port belongs to. </param>
+        /// <param name="index"> The index of the port in <see cref="ISerializedNode"/>'s input ports list. </param>
         /// <param name="compatibleType"> The assembly qualified name of the type this port is compatible with. </param>
         public InPort(string name, string nodeId, int index, string compatibleType) 
             : base(name, nodeId, index, compatibleType)

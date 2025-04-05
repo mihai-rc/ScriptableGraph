@@ -138,7 +138,7 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <summary>
-        /// Releases the unmanaged resources used by the <see cref="SerializedNodeBase"/>.
+        /// Releases the unmanaged resources used by the <see cref="ISerializedNode"/>.
         /// </summary>
         public void Dispose() => OnDispose();
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace GiftHorse.SerializedGraphs.Editor
 {
-    public class ScriptableGraphEditorContext
+    public class SerializedGraphEditorContext
     {
         /// <summary>
         /// Reference to the graph component.
@@ -12,9 +12,9 @@ namespace GiftHorse.SerializedGraphs.Editor
         public SerializedGraphBase Graph { get; private set; }
         
         /// <summary>
-        /// The <see cref="ScriptableGraphView"/> that edits the <see cref="SerializedGraphBase"/>.
+        /// The <see cref="SerializedGraphView"/> that edits the <see cref="SerializedGraphBase"/>.
         /// </summary>
-        public ScriptableGraphView GraphView { get; private set; }
+        public SerializedGraphView GraphView { get; private set; }
         
         /// <summary>
         /// The serialized object of the <see cref="SerializedGraphBase"/>.
@@ -22,9 +22,9 @@ namespace GiftHorse.SerializedGraphs.Editor
         public SerializedObject SerializedObject { get; private set; }
         
         /// <summary>
-        /// The editor window that contains the <see cref="ScriptableGraphView"/>.
+        /// The editor window that contains the <see cref="SerializedGraphView"/>.
         /// </summary>
-        public ScriptableGraphWindow Window { get; }
+        public SerializedGraphWindow Window { get; }
         
         /// <summary>
         /// Whether the graph has unsaved changes or not.
@@ -34,23 +34,23 @@ namespace GiftHorse.SerializedGraphs.Editor
         private NodeSearchWindow m_SearchWindow;
 
         /// <summary>
-        /// <see cref="ScriptableGraphEditorContext"/>'s constructor.
+        /// <see cref="SerializedGraphEditorContext"/>'s constructor.
         /// </summary>
         /// <param name="graph"> Reference to the graph component. </param>
-        /// <param name="window"> The editor window that contains the <see cref="ScriptableGraphView"/>. </param>
-        public ScriptableGraphEditorContext(SerializedGraphBase graph, ScriptableGraphWindow window)
+        /// <param name="window"> The editor window that contains the <see cref="SerializedGraphView"/>. </param>
+        public SerializedGraphEditorContext(SerializedGraphBase graph, SerializedGraphWindow window)
         {
             Graph = graph;
             Window = window;
         }
         
         /// <summary>
-        /// Draws the <see cref="ScriptableGraphView"/> in the editor window.
+        /// Draws the <see cref="SerializedGraphView"/> in the editor window.
         /// </summary>
         public void DrawGraphView()
         {
             SerializedObject = new SerializedObject(Graph);
-            GraphView = new ScriptableGraphView(this);
+            GraphView = new SerializedGraphView(this);
             GraphView.graphViewChanged += change =>
             {
                 MarkAssetAsDirty();
@@ -75,7 +75,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         {
             if (Graph == null)
             {
-                if (Window.TryGetScriptableGraph(out var graph))
+                if (Window.TryGetSerializedGraph(out var graph))
                     Graph = graph;
             }
                 

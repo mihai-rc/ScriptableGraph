@@ -6,20 +6,20 @@ using UnityEngine.SceneManagement;
 namespace GiftHorse.SerializedGraphs.Editor
 {
     /// <summary>
-    /// <see cref="EditorWindow"/> class used to display a <see cref="ScriptableGraphView"/> in the editor.
+    /// <see cref="EditorWindow"/> class used to display a <see cref="SerializedGraphView"/> in the editor.
     /// </summary>
-    public class ScriptableGraphWindow : EditorWindow
+    public class SerializedGraphWindow : EditorWindow
     {
         private const string k_WindowIcon = "d_SceneViewTools";
         private const string k_ComponentNotFound = "[Editor] [SerializedGraph] SerializedGraph component couldn't be found at the cached path: {0}.";
 
         /// <summary>
-        /// Opens a <see cref="ScriptableGraphWindow"/> for the given <see cref="SerializedGraphBase"/>.
+        /// Opens a <see cref="SerializedGraphWindow"/> for the given <see cref="SerializedGraphBase"/>.
         /// </summary>
         /// <param name="sceneAsset"> Reference to the graph component the window will edit. </param>
         public static void Open(SerializedGraphBase sceneAsset)
         {
-            var windows = Resources.FindObjectsOfTypeAll<ScriptableGraphWindow>();
+            var windows = Resources.FindObjectsOfTypeAll<SerializedGraphWindow>();
             foreach (var window in windows)
             {
                 if (window.m_Context is null) 
@@ -32,13 +32,13 @@ namespace GiftHorse.SerializedGraphs.Editor
                 return;
             }
 
-            var newWindow = CreateWindow<ScriptableGraphWindow>(typeof(ScriptableGraphWindow), typeof(SceneView));
+            var newWindow = CreateWindow<SerializedGraphWindow>(typeof(SerializedGraphWindow), typeof(SceneView));
             newWindow.titleContent = new GUIContent(sceneAsset.name, EditorGUIUtility.IconContent(k_WindowIcon).image);
             newWindow.Load(sceneAsset);
         }
 
         [SerializeField] private string m_GraphHierarchyPath;
-        private ScriptableGraphEditorContext m_Context;
+        private SerializedGraphEditorContext m_Context;
         private Scene m_Scene;
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// </summary>
         /// <param name="graph"> The reference to the <see cref="SerializedGraphBase"/> if found, otherwise is null. </param>
         /// <returns> Returns whether the <see cref="SerializedGraphBase"/> was found or not. </returns>
-        public bool TryGetScriptableGraph(out SerializedGraphBase graph)
+        public bool TryGetSerializedGraph(out SerializedGraphBase graph)
         {
             graph = null;
             if (string.IsNullOrEmpty(m_GraphHierarchyPath)) 
@@ -64,7 +64,7 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private void OnEnable()
         {
-            if (!TryGetScriptableGraph(out var graph)) 
+            if (!TryGetSerializedGraph(out var graph)) 
                 return;
 
             if (graph is null)
@@ -97,7 +97,7 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private void CreateGraph(SerializedGraphBase graph)
         {
-            m_Context = new ScriptableGraphEditorContext(graph, this);
+            m_Context = new SerializedGraphEditorContext(graph, this);
             m_Context.DrawGraphView();
         }
 

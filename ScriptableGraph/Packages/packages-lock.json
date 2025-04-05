@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "com.gift-horse.scriptable-graph": {
-      "version": "file:ScriptableGraph",
+    "com.gift-horse.serialized-graph": {
+      "version": "file:SerializedGraph",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}

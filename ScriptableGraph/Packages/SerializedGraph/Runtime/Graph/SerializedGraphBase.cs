@@ -13,13 +13,13 @@ namespace GiftHorse.SerializedGraphs
         private const string k_SceneNotLoaded = "[SerializedGraph] The graph: {0} cannot be interacted with when its parent scene: {1} is not loaded!";
         private const string k_PortsAlreadyConnected = "[SerializedGraph] Trying to connect two ports that are already connected! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
         private const string k_PortsNotConnected = "[SerializedGraph] Trying to disconnect two ports that are not connected! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
-        private const string k_PortsTypeMismatch = "[SerializedGraph] Trying to connect two ports that are not the same type! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
+        private const string k_PortsTypeMismatch = "[SerializedGraph] Trying to connect two ports that are not of the same type! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
         private const string k_PortsOfTheSameNode = "[SerializedGraph] Trying to connect two ports that belong to the same node! Graph name: {0}, From Port Index: {1} To Port Index: {2}";
-        private const string k_NodeNotFound = "[SerializedGraph] No node was found with Id: {0}! Graph name: {1}.";
+        private const string k_NodeNotFound = "[SerializedGraph] No node was found for Id: {0}! Graph name: {1}.";
         private const string k_ConnectionNotFound = "[SerializedGraph] No connection was found for Id: {0}! Graph name: {1}.";
         private const string k_NodeCastFailed = "[SerializedGraph] Cast failed! The node with Id: {0} is not of type: {1}! Graph name: {2}.";
 
-        [SerializeReference] private List<SerializedNodeBase> m_Nodes;
+        [SerializeReference] private List<ISerializedNode> m_Nodes;
         [SerializeReference] private List<Connection> m_Connections;
 
         private Dictionary<string, ISerializedNode> m_NodesById;
@@ -27,19 +27,19 @@ namespace GiftHorse.SerializedGraphs
         private readonly HashSet<string> m_VisitedNodes = new();
 
         /// <summary>
-        /// The Assembly Qualified Name of the node's specialized parent type that inherits from <see cref="SerializedNodeBase"/>.
+        /// The Assembly Qualified Name of the node's specialized base type that implements from <see cref="ISerializedNode"/>.
         /// </summary>
         public abstract string NodesBaseType { get; }
 
         /// <summary>
-        /// List of all nodes sorted in the order of execution.
+        /// Collection of all <see cref="ISerializedNode"/>s sorted in the order of execution.
         /// </summary>
         public IEnumerable<ISerializedNode> Nodes => m_Nodes;
 
         /// <summary>
-        /// List of all connections.
+        /// Collection of all <see cref="Connection"/>s.
         /// </summary>
-        public List<Connection> Connections => m_Connections;
+        public IEnumerable<Connection> Connections => m_Connections;
         
         private bool IsSceneLoaded => gameObject.scene.isLoaded;
         
@@ -48,7 +48,7 @@ namespace GiftHorse.SerializedGraphs
             get
             {
                 if (m_NodesById is null)
-                    m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n as ISerializedNode);
+                    m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n);
                 
                 return m_NodesById;
             }
@@ -67,7 +67,7 @@ namespace GiftHorse.SerializedGraphs
 
         protected SerializedGraphBase()
         {
-            m_Nodes = new List<SerializedNodeBase>();
+            m_Nodes = new List<ISerializedNode>();
             m_Connections = new List<Connection>();
         }
 
@@ -91,19 +91,19 @@ namespace GiftHorse.SerializedGraphs
         /// <summary>
         /// Callback called when a <see cref="Connection"/> is formed.
         /// </summary>
-        /// <param name="fromNode"> Reference to the <see cref="ISerializedNode"/> the connection starts from. </param>
-        /// <param name="fromPort"> The <see cref="OutPort"/> the connection starts from. </param>
-        /// <param name="toNode"> Reference to the <see cref="ISerializedNode"/> the connection goes to. </param>
-        /// <param name="toPort"> The <see cref="InPort"/> the connection goes to. </param>
+        /// <param name="fromNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> starts from. </param>
+        /// <param name="fromPort"> The <see cref="OutPort"/> the <see cref="Connection"/> starts from. </param>
+        /// <param name="toNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> goes to. </param>
+        /// <param name="toPort"> The <see cref="InPort"/> the <see cref="Connection"/> goes to. </param>
         protected abstract void OnConnectionCreated(ISerializedNode fromNode, OutPort fromPort, ISerializedNode toNode, InPort toPort);
 
         /// <summary>
         /// Callback called when a <see cref="Connection"/> is removed.
         /// </summary>
-        /// <param name="fromNode"> Reference to the <see cref="ISerializedNode"/> the connection starts from. </param>
-        /// <param name="fromPort"> The <see cref="OutPort"/> the connection starts from. </param>
-        /// <param name="toNode"> Reference to the <see cref="ISerializedNode"/> the connection goes to. </param>
-        /// <param name="toPort"> The <see cref="InPort"/> the connection goes to. </param>
+        /// <param name="fromNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> starts from. </param>
+        /// <param name="fromPort"> The <see cref="OutPort"/> the <see cref="Connection"/> starts from. </param>
+        /// <param name="toNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> goes to. </param>
+        /// <param name="toPort"> The <see cref="InPort"/> the <see cref="Connection"/> goes to. </param>
         protected abstract void OnConnectionRemoved(ISerializedNode fromNode, OutPort fromPort, ISerializedNode toNode, InPort toPort);
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace GiftHorse.SerializedGraphs
         protected virtual void OnStart() { }
         
         /// <summary>
-        /// Executes all nodes processes.
+        /// Executes all <see cref="ISerializedNode"/>s processes.
         /// </summary>
         public void Process()
         {
@@ -132,7 +132,7 @@ namespace GiftHorse.SerializedGraphs
                 return;
             }
             
-            m_Nodes.Add(node as SerializedNodeBase);
+            m_Nodes.Add(node);
             NodesById[node.Id] = node;
         }
 
@@ -148,16 +148,16 @@ namespace GiftHorse.SerializedGraphs
                 return;
             }
             
-            m_Nodes.Remove(node as SerializedNodeBase);
+            m_Nodes.Remove(node);
             NodesById.Remove(node.Id);
         }
 
         /// <summary>
-        /// Connects two nodes at the specified port indices and stores the <see cref="Connection"/> in the graph data structure.
+        /// Connects two <see cref="ISerializedNode"/>s at the specified port indices and stores the <see cref="Connection"/> in the graph data structure.
         /// </summary>
-        /// <param name="fromNode"> Reference to the <see cref="ISerializedNode"/> the connection starts from. </param>
+        /// <param name="fromNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> starts from. </param>
         /// <param name="fromPortIndex"> The index of the port the <see cref="Connection"/> starts from. </param>
-        /// <param name="toNode"> Reference to the <see cref="ISerializedNode"/> the connection goes to. </param>
+        /// <param name="toNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> goes to. </param>
         /// <param name="toPortIndex"> The index of the port the <see cref="Connection"/> goes to. </param>
         public void ConnectNodes(ISerializedNode fromNode, int fromPortIndex, ISerializedNode toNode, int toPortIndex)
         {
@@ -185,9 +185,9 @@ namespace GiftHorse.SerializedGraphs
         /// Disconnects two <see cref="ISerializedNode"/>s at the specified port indices and removes the <see cref="Connection"/> from the graph data structure.
         /// </summary>
         /// <param name="fromNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> starts from. </param>
-        /// <param name="fromPortIndex"> The index of the port the connection starts from. </param>
+        /// <param name="fromPortIndex"> The index of the port the <see cref="Connection"/> starts from. </param>
         /// <param name="toNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> goes to. </param>
-        /// <param name="toPortIndex"> The index of the port the connection goes to. </param>
+        /// <param name="toPortIndex"> The index of the port the <see cref="Connection"/> goes to. </param>
         public void DisconnectNodes(ISerializedNode fromNode, int fromPortIndex, ISerializedNode toNode, int toPortIndex)
         {
             if (!IsSceneLoaded)
@@ -211,16 +211,16 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <summary>
-        /// Updates nodes and connections mappings on editor undo.
+        /// Updates <see cref="ISerializedNode"/>s and <see cref="Connection"/>s mappings on editor undo.
         /// </summary>
         public void UpdateMappings()
         {
-            m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n as ISerializedNode);
+            m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n);
             m_ConnectionsById = m_Connections.ToDictionary(c => c.Id, c => c);
         }
 
         /// <summary>
-        /// Tries to get a node by its id.
+        /// Tries to get a <see cref="ISerializedNode"/> by its id.
         /// </summary>
         /// <param name="nodeId"> The id of the node. </param>
         /// <param name="node"> The reference to the corresponding node. Is null if the id was not found. </param>
@@ -252,9 +252,9 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <summary>
-        /// Tries to get the origin node of a connection.
+        /// Tries to get the origin <see cref="ISerializedNode"/> of a <see cref="Connection"/>.
         /// </summary>
-        /// <param name="connectionId"> The id of the connection. </param>
+        /// <param name="connectionId"> The id of the <see cref="Connection"/>. </param>
         /// <param name="node"> The reference to the origin node. Is null if the node was not found. </param>
         /// <typeparam name="T"> The subtype the node is expected te be received as. </typeparam>
         /// <returns> Returns true if the node was found, otherwise returns false. </returns>
@@ -277,9 +277,9 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <summary>
-        /// Tries to get the destination node of a connection.
+        /// Tries to get the destination <see cref="ISerializedNode"/> of a <see cref="Connection"/>.
         /// </summary>
-        /// <param name="connectionId"> The id of the connection. </param>
+        /// <param name="connectionId"> The id of the <see cref="Connection"/>. </param>
         /// <param name="node"> The reference to the destination node. Is null if the node was not found. </param>
         /// <typeparam name="T"> The subtype the node is expected te be received as. </typeparam>
         /// <returns> Returns true if the node was found, otherwise returns false. </returns>
@@ -302,11 +302,11 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <summary>
-        /// Tries to get a connection by its id.
+        /// Tries to get a <see cref="Connection"/> by its id.
         /// </summary>
-        /// <param name="connectionId"> The id of the connection. </param>
-        /// <param name="connection"> The reference to the corresponding connection. Is null if the id was not found. </param>
-        /// <returns> Returns true if the connection was found, otherwise returns false. </returns>
+        /// <param name="connectionId"> The id of the <see cref="Connection"/>. </param>
+        /// <param name="connection"> The reference to the corresponding <see cref="Connection"/>. Is null if the id was not found. </param>
+        /// <returns> Returns true if the <see cref="Connection"/> was found, otherwise returns false. </returns>
         public bool TryGetConnectionById(string connectionId, out Connection connection)
         {
             connection = null;

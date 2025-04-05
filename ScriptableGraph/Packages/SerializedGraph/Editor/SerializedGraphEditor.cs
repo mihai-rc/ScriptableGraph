@@ -7,7 +7,7 @@ namespace GiftHorse.SerializedGraphs.Editor
     /// Custom inspector editor of the classes that inherit from <see cref="SerializedGraphBase"/>.
     /// </summary>
     [CustomEditor(typeof(SerializedGraphBase), true)]
-    public class ScriptableGraphEditor : UnityEditor.Editor
+    public class SerializedGraphEditor : UnityEditor.Editor
     {
         private const string k_ContextMenuPath = "CONTEXT/SerializedGraph/Edit Graph";
         private const string k_ButtonText = "Edit Graph";
@@ -16,7 +16,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         [MenuItem(k_ContextMenuPath)]
         private static void OpenGraphEditorWindow(MenuCommand command)
         {
-            ScriptableGraphWindow.Open(command.context as SerializedGraphBase);
+            SerializedGraphWindow.Open(command.context as SerializedGraphBase);
         }
 
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             var editGraphButton = GUILayout.Button(k_ButtonText, GUILayout.Height(k_ButtonsHeight));
             if (editGraphButton)
             {
-                ScriptableGraphWindow.Open(target as SerializedGraphBase);
+                SerializedGraphWindow.Open(target as SerializedGraphBase);
             }
             
             GUI.enabled = false;

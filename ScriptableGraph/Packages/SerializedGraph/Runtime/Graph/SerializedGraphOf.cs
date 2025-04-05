@@ -8,21 +8,21 @@ namespace GiftHorse.SerializedGraphs
         public override string NodesBaseType => typeof(TNode).AssemblyQualifiedName;
 
         /// <summary>
-        /// Callback called when a connection is created.
+        /// Callback called when a <see cref="Connection"/> is created.
         /// </summary>
-        /// <param name="fromNode"> Reference to the node the connection starts from. </param>
-        /// <param name="fromPort"> The <see cref="OutPort"/> the connection starts from. </param>
-        /// <param name="toNode"> Reference to the node the connection goes to. </param>
-        /// <param name="toPort"> The <see cref="InPort"/> the connection goes to. </param>
+        /// <param name="fromNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> starts from. </param>
+        /// <param name="fromPort"> The <see cref="OutPort"/> the <see cref="Connection"/> starts from. </param>
+        /// <param name="toNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> goes to. </param>
+        /// <param name="toPort"> The <see cref="InPort"/> the <see cref="Connection"/> goes to. </param>
         protected virtual void OnConnect(TNode fromNode, OutPort fromPort, TNode toNode, InPort toPort) { }
 
         /// <summary>
-        /// Callback called when a connection is removed.
+        /// Callback called when a <see cref="Connection"/> is removed.
         /// </summary>
-        /// <param name="fromNode"> Reference to the node the connection starts from. </param>
-        /// <param name="fromPort"> The <see cref="OutPort"/> the connection starts from. </param>
-        /// <param name="toNode"> Reference to the node the connection goes to. </param>
-        /// <param name="toPort"> The <see cref="InPort"/> the connection goes to. </param>
+        /// <param name="fromNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> starts from. </param>
+        /// <param name="fromPort"> The <see cref="OutPort"/> the <see cref="Connection"/> starts from. </param>
+        /// <param name="toNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> goes to. </param>
+        /// <param name="toPort"> The <see cref="InPort"/> the <see cref="Connection"/> goes to. </param>
         protected virtual void OnDisconnect(TNode fromNode, OutPort fromPort, TNode toNode, InPort toPort) { }
 
         /// <inheritdoc />

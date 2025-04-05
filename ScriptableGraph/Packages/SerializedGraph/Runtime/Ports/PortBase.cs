@@ -15,7 +15,7 @@ namespace GiftHorse.SerializedGraphs
         [SerializeField] private string m_CompatibleType;
         
         /// <summary>
-        /// Returns true if the port is not part of any connection, otherwise it returns false.
+        /// Returns true if the port is not part of any <see cref="Connection"/>, otherwise it returns false.
         /// </summary>
         public abstract bool IsEmpty { get; }
 
@@ -25,12 +25,12 @@ namespace GiftHorse.SerializedGraphs
         public string Name => m_Name;
 
         /// <summary>
-        /// The id of the node this port belongs to.
+        /// The id of the <see cref="ISerializedNode"/> this port belongs to.
         /// </summary>
         public string NodeId => m_NodeId;
 
         /// <summary>
-        /// The index of this port in the node's input or output ports list.
+        /// The index of this port in the <see cref="ISerializedNode"/>'s input or output ports list.
         /// </summary>
         public int Index => m_Index;
         
@@ -43,8 +43,8 @@ namespace GiftHorse.SerializedGraphs
         /// <see cref="PortBase"/> constructor.
         /// </summary>
         /// <param name="name"> The name of the port. </param>
-        /// <param name="nodeId"> The id of the node this port belongs to. </param>
-        /// <param name="index"> The index of the port in the node's input or output ports list. </param>
+        /// <param name="nodeId"> The id of the <see cref="ISerializedNode"/> this port belongs to. </param>
+        /// <param name="index"> The index of the port in the <see cref="ISerializedNode"/>'s input or output ports list. </param>
         /// <param name="compatibleType"> The assembly qualified name of the type this port is compatible with. </param>
         protected PortBase(string name, string nodeId, int index, string compatibleType)
         {

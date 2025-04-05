@@ -15,7 +15,7 @@ namespace GiftHorse.SerializedGraphs
         private List<string> m_ConnectionIds;
 
         /// <summary>
-        /// List of connections ids this port is linked to.
+        /// List of <see cref="Connection"/>s ids this port is linked to.
         /// </summary>
         public List<string> ConnectionIds => m_ConnectionIds;
         
@@ -26,8 +26,8 @@ namespace GiftHorse.SerializedGraphs
         /// <see cref="OutPort"/> constructor.
         /// </summary>
         /// <param name="name"> The name of the port. </param>
-        /// <param name="nodeId"> The id of the node this port belongs to. </param>
-        /// <param name="index"> The index of the port in node's output ports list. </param>
+        /// <param name="nodeId"> The id of the <see cref="ISerializedNode"/> this port belongs to. </param>
+        /// <param name="index"> The index of the port in <see cref="ISerializedNode"/>'s output ports list. </param>
         /// <param name="compatibleType"> The assembly qualified name of the type this port is compatible with. </param>
         public OutPort(string name, string nodeId, int index, string compatibleType) 
             : base(name, nodeId, index, compatibleType)

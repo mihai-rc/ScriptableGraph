@@ -11,9 +11,9 @@ namespace GiftHorse.SerializedGraphs.Editor
     /// <summary>
     /// <see cref="GraphView"/> class used to display the <see cref="SerializedGraphBase"/> in the editor.
     /// </summary>
-    public class ScriptableGraphView : GraphView
+    public class SerializedGraphView : GraphView
     {
-        private const string k_UssFilePath = "Packages/com.gift-horse.scriptable-graph/Editor/Uss/ScriptableGraphView.uss";
+        private const string k_UssFilePath = "Packages/com.gift-horse.serialized-graph/Editor/Uss/SerializedGraphView.uss";
         private const string k_UssFileNotFoundError = "[Editor] [SerializedGraph] No uss file was found at: {0}.";
         private const string k_BackgroundName = "Background";
         private const string k_AddNodeUndoRecord = "Added Graph Node";
@@ -21,16 +21,16 @@ namespace GiftHorse.SerializedGraphs.Editor
         private const string k_MoveNodeUndoRecord = "Moved Graph Nodes";
         private const string k_RemoveElementUndoRecord = "Removed Graph Element";
 
-        private readonly ScriptableGraphEditorContext m_Context;
-        private readonly List<ScriptableNodeView> m_NodeViews = new();
+        private readonly SerializedGraphEditorContext m_Context;
+        private readonly List<SerializedNodeView> m_NodeViews = new();
         private readonly List<Edge> m_EdgeViews = new();
-        private readonly Dictionary<string, ScriptableNodeView> m_NodeViewsByNodeId = new();
+        private readonly Dictionary<string, SerializedNodeView> m_NodeViewsByNodeId = new();
 
         /// <summary>
-        /// <see cref="ScriptableGraphView"/>'s constructor.
+        /// <see cref="SerializedGraphView"/>'s constructor.
         /// </summary>
         /// <param name="context"> Reference to the <see cref="SearchWindowContext"/> to access relevant dependencies and draw the graph. </param>
-        public ScriptableGraphView(ScriptableGraphEditorContext context)
+        public SerializedGraphView(SerializedGraphEditorContext context)
         {
             m_Context = context;
 
@@ -47,7 +47,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             Undo.undoRedoPerformed += OnUndoRedoPerformed;
         }
 
-        ~ScriptableGraphView()
+        ~SerializedGraphView()
         {
             Undo.undoRedoPerformed -= OnUndoRedoPerformed;
         }
@@ -79,7 +79,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// <summary>
         /// Adds a <see cref="ISerializedNode"/> to the graph data structure when an entry is selected from <see cref="NodeSearchWindow"/>.
         /// </summary>
-        /// <param name="node"> Reference to the newly created node. </param>
+        /// <param name="node"> Reference to the newly created <see cref="ISerializedNode"/>. </param>
         public void Add(ISerializedNode node)
         {
             Undo.RecordObject(m_Context.SerializedObject.targetObject, k_AddNodeUndoRecord);
@@ -94,9 +94,11 @@ namespace GiftHorse.SerializedGraphs.Editor
         private void LoadUssFile()
         {
             var uss = AssetDatabase.LoadAssetAtPath<StyleSheet>(k_UssFilePath);
-            
             if (uss is null)
+            {
                 Debug.LogErrorFormat(k_UssFileNotFoundError, k_UssFilePath);
+                return;
+            }
 
             styleSheets.Add(uss);
         }
@@ -152,7 +154,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         private void UpdateExpandedNodes()
         {
             foreach (var node in m_NodeViews)
-                node.expanded = node.SerializedNodeBase.Expanded;
+                node.expanded = node.SerializedNode.Expanded;
         }
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
@@ -161,7 +163,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             {
                 Undo.RecordObject(m_Context.SerializedObject.targetObject, k_MoveNodeUndoRecord);
 
-                foreach (var movedNode in graphViewChange.movedElements.OfType<ScriptableNodeView>())
+                foreach (var movedNode in graphViewChange.movedElements.OfType<SerializedNodeView>())
                     movedNode.SavePosition();
             }
 
@@ -172,7 +174,7 @@ namespace GiftHorse.SerializedGraphs.Editor
                 foreach (var removedEdge in graphViewChange.elementsToRemove.OfType<Edge>())
                     RemoveConnection(removedEdge);
 
-                foreach (var removedNode in graphViewChange.elementsToRemove.OfType<ScriptableNodeView>())
+                foreach (var removedNode in graphViewChange.elementsToRemove.OfType<SerializedNodeView>())
                     RemoveNodeFromGraph(removedNode);
             }
 
@@ -207,7 +209,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         private void AddNodeToGraph(ISerializedNode node)
         {
             var isSearchableNode = ReflectionHelper.IsNodeExcludedFromSearch(node.GetType());
-            var nodeView = new ScriptableNodeView(node, m_Context, !isSearchableNode);
+            var nodeView = new SerializedNodeView(node, m_Context, !isSearchableNode);
             nodeView.SetPosition(node.Position);
 
             m_NodeViews.Add(nodeView);
@@ -216,24 +218,24 @@ namespace GiftHorse.SerializedGraphs.Editor
             AddElement(nodeView);
         }
 
-        private void RemoveNodeFromGraph(ScriptableNodeView nodeView)
+        private void RemoveNodeFromGraph(SerializedNodeView nodeView)
         {
-            m_Context.Graph.RemoveNode(nodeView.SerializedNodeBase);
+            m_Context.Graph.RemoveNode(nodeView.SerializedNode);
             m_Context.SerializedObject.Update();
 
-            m_NodeViewsByNodeId.Remove(nodeView.SerializedNodeBase.Id);
+            m_NodeViewsByNodeId.Remove(nodeView.SerializedNode.Id);
             m_NodeViews.Remove(nodeView);
         }
 
         private void CreateConnection(Edge edge)
         {
-            var toNodeView = edge.input.node as ScriptableNodeView;
+            var toNodeView = edge.input.node as SerializedNodeView;
             var toIndex = toNodeView.InPorts.IndexOf(edge.input);
-            var toNode = toNodeView.SerializedNodeBase;
+            var toNode = toNodeView.SerializedNode;
 
-            var fromNodeView = edge.output.node as ScriptableNodeView;
+            var fromNodeView = edge.output.node as SerializedNodeView;
             var fromIndex = fromNodeView.OutPorts.IndexOf(edge.output);
-            var fromNode = fromNodeView.SerializedNodeBase;
+            var fromNode = fromNodeView.SerializedNode;
 
             m_EdgeViews.Add(edge);
             m_Context.Graph.ConnectNodes(fromNode, fromIndex, toNode, toIndex);
@@ -241,13 +243,13 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private void RemoveConnection(Edge edge)
         {
-            var toNodeView = edge.input.node as ScriptableNodeView;
+            var toNodeView = edge.input.node as SerializedNodeView;
             var toIndex = toNodeView.InPorts.IndexOf(edge.input);
-            var toNode = toNodeView.SerializedNodeBase;
+            var toNode = toNodeView.SerializedNode;
 
-            var fromNodeView = edge.output.node as ScriptableNodeView;
+            var fromNodeView = edge.output.node as SerializedNodeView;
             var fromIndex = fromNodeView.OutPorts.IndexOf(edge.output);
-            var fromNode = fromNodeView.SerializedNodeBase;
+            var fromNode = fromNodeView.SerializedNode;
 
             m_Context.Graph.DisconnectNodes(fromNode, fromIndex, toNode, toIndex);
         }

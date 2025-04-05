@@ -24,15 +24,15 @@ namespace GiftHorse.SerializedGraphs.Editor
         private const string k_Header = "Create Node";
         private const string k_NodeIcon = "d_winbtn_win_max@2x";
 
-        private ScriptableGraphWindow m_Window;
-        private ScriptableGraphView m_GraphView;
+        private SerializedGraphWindow m_Window;
+        private SerializedGraphView m_GraphView;
         private SerializedGraphBase m_Graph;
 
         /// <summary>
         /// Initializes the search window with the context of the graph editor.
         /// </summary>
-        /// <param name="context"> Reference to the <see cref="ScriptableGraphEditorContext"/> of this graph. </param>
-        public void Init(ScriptableGraphEditorContext context)
+        /// <param name="context"> Reference to the <see cref="SerializedGraphEditorContext"/> of this graph. </param>
+        public void Init(SerializedGraphEditorContext context)
         {
             m_Window = context.Window;
             m_GraphView = context.GraphView;
@@ -66,7 +66,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             if (searchTreeEntry.userData is not Type type) 
                 return false;
 
-            if (Activator.CreateInstance(type) is not SerializedNodeBase node) 
+            if (Activator.CreateInstance(type) is not ISerializedNode node) 
                 return false;
 
             node.Position = new Rect(graphMousePosition, new Vector2());

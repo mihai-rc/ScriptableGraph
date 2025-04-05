@@ -10,7 +10,7 @@ namespace GiftHorse.SerializedGraphs
     public interface ISerializedNode : IDisposable
     {
         /// <summary>
-        /// Reference to the <see cref="SerializedGraphBase"/> that owns this node.
+        /// Reference to the <see cref="SerializedGraphBase"/> that owns this <see cref="ISerializedNode"/>.
         /// </summary>
         SerializedGraphBase Graph { get; }
 

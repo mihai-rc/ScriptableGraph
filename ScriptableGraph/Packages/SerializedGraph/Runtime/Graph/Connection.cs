@@ -21,25 +21,25 @@ namespace GiftHorse.SerializedGraphs
         private Action m_TransferValueFn;
 
         /// <summary>
-        /// The id of this connection.
+        /// The id of this <see cref="Connection"/>.
         /// </summary>
         public string Id => m_Id;
 
         /// <summary>
-        /// The <see cref="OutPort"/> this connection is taking its value from.
+        /// The <see cref="OutPort"/> this <see cref="Connection"/> is taking its value from.
         /// </summary>
         public OutPort FromPort => m_FromPort;
 
         /// <summary>
-        /// The <see cref="InPort"/> this connection is giving its value to.
+        /// The <see cref="InPort"/> this <see cref="Connection"/> is giving its value to.
         /// </summary>
         public InPort ToPort => m_ToPort;
 
         /// <summary>
         /// <see cref="Connection"/> constructor.
         /// </summary>
-        /// <param name="fromPort"> The <see cref="OutPort"/> this connection is taking its value from. </param>
-        /// <param name="toPort"> The <see cref="InPort"/> this connection is giving its value to. </param>
+        /// <param name="fromPort"> The <see cref="OutPort"/> this <see cref="Connection"/> is taking its value from. </param>
+        /// <param name="toPort"> The <see cref="InPort"/> this <see cref="Connection"/> is giving its value to. </param>
         public Connection(OutPort fromPort, InPort toPort)
         {
             m_Id = Guid.NewGuid().ToString();
@@ -48,9 +48,9 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <summary>
-        /// Initializes the connection.
+        /// Initializes the <see cref="Connection"/>.
         /// </summary>
-        /// <param name="nodesById"> Dictionary of the nodes mapped to their ids. </param>
+        /// <param name="nodesById"> Dictionary of the <see cref="ISerializedNode"/>s mapped to their ids. </param>
         public void Init(Dictionary<string, ISerializedNode> nodesById) => m_TransferValueFn = CreateTransferValueDelegate(nodesById);
         
         /// <summary>
@@ -63,11 +63,11 @@ namespace GiftHorse.SerializedGraphs
         /// corresponding to the connected ports and assigns the output to the input.
         /// </summary>
         /// <param name="nodesById">
-        /// Dictionary of the nodes mapped to their ids.
+        /// Dictionary of the <see cref="ISerializedNode"/>s mapped to their ids.
         /// </param>
         /// <returns>
         /// A delegate that assigns the input field of the receiving
-        /// node to the output field of the emitting node.
+        /// <see cref="ISerializedNode"/> to the output field of the emitting <see cref="ISerializedNode"/>.
         /// </returns>
         /// <remarks>
         /// In order for this to work, the fields of the nodes must be public and the <see cref="SerializedGraphBase.Nodes"/>

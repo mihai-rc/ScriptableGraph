@@ -3,7 +3,7 @@ using System;
 namespace GiftHorse.SerializedGraphs.Attributes
 {
     /// <summary>
-    /// Attribute class used to specify the node's type path.
+    /// Attribute class used to specify the node's metadata.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class NodeScriptAttribute : Attribute
