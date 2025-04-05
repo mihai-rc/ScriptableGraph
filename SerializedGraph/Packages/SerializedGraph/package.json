@@ -6,7 +6,7 @@
   "unity": "2022.3",
   "unityRelease": "58f1",
   "changelogUrl": "https://github.com/mihai-rc/SerializedGraph/blob/main/SerializedGraph/Packages/SerializedGraph/CHANGELOG.md",
-  "licensesUrl": "https://github.com/mihai-rc/SerializedGraph/blob/main/SerializedGraph/Packages/SerializedGraph/LICENSE.md",
+  "licensesUrl": "https://github.com/mihai-rc/SerializedGraph/blob/main/SerializedGraph/Packages/SerializedGraph/LICENSE",
   "author": {
     "name": "Robert-Mihai Craciun",
     "email": "mihai.rcraciun@gmail.com",
