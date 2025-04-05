@@ -59,7 +59,6 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// <inheritdoc />
         public bool OnSelectEntry(SearchTreeEntry searchTreeEntry, SearchWindowContext context)
         {
-            
             var windowMousePosition = m_Window.rootVisualElement.ChangeCoordinatesTo(m_GraphView, context.screenMousePosition - m_Window.position.position);
             var graphMousePosition = m_GraphView.contentViewContainer.WorldToLocal(windowMousePosition);
 

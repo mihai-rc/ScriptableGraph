@@ -208,8 +208,7 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private void AddNodeToGraph(ISerializedNode node)
         {
-            var isSearchableNode = ReflectionHelper.IsNodeExcludedFromSearch(node.GetType());
-            var nodeView = new SerializedNodeView(node, m_Context, !isSearchableNode);
+            var nodeView = new SerializedNodeView(node, m_Context);
             nodeView.SetPosition(node.Position);
 
             m_NodeViews.Add(nodeView);

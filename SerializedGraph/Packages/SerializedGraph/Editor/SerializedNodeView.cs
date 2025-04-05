@@ -19,12 +19,12 @@ namespace GiftHorse.SerializedGraphs.Editor
         private const string k_NodesProperty = "m_Nodes";
         private const string k_SerializedPropertyNotFoundError = "[Editor] [SerializedGraph] Could not find the SerializedProperty of ISerializedNode: {0}, Id: {1}.";
         private const string k_InvalidNodeProperty = "[Editor] [SerializedGraph] Could not find the relative property by name: {0}. Make sure you use [NodeField] attribute only with serialized types.";
-        
+
         private readonly ISerializedNode m_SerializedNode;
         private readonly SerializedGraphEditorContext m_Context;
         private SerializedProperty m_SerializedProperty;
         private VisualElement m_PropertiesHolder;
-        
+
         /// <summary>
         /// Reference to the <see cref="ISerializedNode"/> this view is handling.
         /// </summary>
@@ -34,7 +34,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// List of all <see cref="InPort"/> views of this node.
         /// </summary>
         public List<Port> InPorts { get; } = new();
-        
+
         /// <summary>
         /// List of all <see cref="OutPort"/> views of this node.
         /// </summary>
@@ -45,21 +45,20 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// </summary>
         /// <param name="node"> Reference to the <see cref="ISerializedNode"/> this view is handling. </param>
         /// <param name="context"> Reference to the <see cref="SearchWindowContext"/> to access relevant dependencies. </param>
-        /// <param name="isDeletable"> Flag representing whether the user can or cannot delete the <see cref="ISerializedNode"/> from the <see cref="SerializedGraphView"/>. </param>
-        public SerializedNodeView(ISerializedNode node, SerializedGraphEditorContext context, bool isDeletable)
+        public SerializedNodeView(ISerializedNode node, SerializedGraphEditorContext context)
         {
             m_SerializedNode = node;
             m_Context = context;
             
             // Remove the delete capability
-            if (!isDeletable)
+            if (ReflectionHelper.IsNodeExcludedFromSearch(node.GetType()))
                 capabilities &= ~Capabilities.Deletable;
             
             CreateInputs();
             CreateOutputs();
             InitializeNodeByReflection();
         }
-        
+
         /// <summary>
         /// Saves the position of this node after the node was moved in the editor and the user saves.
         /// </summary>
@@ -83,7 +82,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             
             return propertiesHolder;
         }
-        
+
         private SerializedProperty InitializeSerializedProperty()
         {
             m_Context.SerializedObject.Update();
@@ -135,7 +134,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             foreach (var inPort in m_SerializedNode.InPorts)
                 CreateInputPort(inPort.Name, Type.GetType(inPort.CompatibleType), false);
         }
-        
+
         private void CreateOutputs()
         {
             foreach (var outPort in m_SerializedNode.OutPorts)
@@ -173,20 +172,21 @@ namespace GiftHorse.SerializedGraphs.Editor
             OutPorts.Add(outputPort);
             outputContainer.Add(outputPort);
         }
-        
+
         private void DrawProperty(string propertyName)
         {
             m_SerializedProperty ??= InitializeSerializedProperty();
-
+            
             var property = m_SerializedProperty.FindPropertyRelative(propertyName);
             if (property is null)
             {
                 Debug.LogErrorFormat(k_InvalidNodeProperty, propertyName);
                 return;
             }
-
+            
             var propertyField = new PropertyField(property);
             propertyField.name = k_PropertyFieldName;
+            propertyField.bindingPath = property.propertyPath;
             propertyField.Bind(property.serializedObject);
             
             m_PropertiesHolder.Add(propertyField);

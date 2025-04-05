@@ -760,7 +760,7 @@ MonoBehaviour:
         m_Id: 584eabf5-127f-4c72-be5c-e5b551bc2172
         m_Position:
           serializedVersion: 2
-          x: -165
+          x: -139
           y: 261
           width: 212
           height: 125
@@ -790,6 +790,217 @@ MonoBehaviour:
           rid: 6174426418051547152
         m_ToPort:
           rid: 6174426418051547145
+--- !u!1 &1426666461
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1426666463}
+  - component: {fileID: 1426666462}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1426666462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1426666461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc88283d05e1d63419228830fde845c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Nodes:
+  - rid: 6174426420277411840
+  - rid: 6174426420277411843
+  - rid: 6174426418998935554
+  - rid: 6174426418998935552
+  m_Connections:
+  - rid: 6174426418998935558
+  - rid: 6174426420277411842
+  - rid: 6174426420277411845
+  references:
+    version: 2
+    RefIds:
+    - rid: 6174426418998935552
+      type: {class: PrintNode, ns: Calculator, asm: Assembly-CSharp}
+      data:
+        m_Id: 1a5062c1-c80c-4c68-bd25-c8a2430ab496
+        m_Position:
+          serializedVersion: 2
+          x: 677
+          y: 264
+          width: 0
+          height: 0
+        m_DepthLevel: 2
+        m_Expanded: 1
+        m_InPorts:
+        - rid: 6174426418998935553
+        m_OutPorts: []
+        Value: 0
+        Logger: {fileID: 0}
+    - rid: 6174426418998935553
+      type: {class: InPort, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Name: Value
+        m_NodeId: 1a5062c1-c80c-4c68-bd25-c8a2430ab496
+        m_Index: 0
+        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        m_ConnectionId: 8c8b7831-f9b9-4c9c-b204-3b207547af17
+    - rid: 6174426418998935554
+      type: {class: SumNode, ns: Calculator, asm: Assembly-CSharp}
+      data:
+        m_Id: 66d02f56-4bc3-4da1-8314-6376efecaa7b
+        m_Position:
+          serializedVersion: 2
+          x: 436
+          y: 264
+          width: 212
+          height: 130
+        m_DepthLevel: 1
+        m_Expanded: 1
+        m_InPorts:
+        - rid: 6174426418998935555
+        - rid: 6174426418998935556
+        m_OutPorts:
+        - rid: 6174426418998935557
+        First: 0
+        Second: 0
+        Value: 0
+        Logger: {fileID: 279511793}
+    - rid: 6174426418998935555
+      type: {class: InPort, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Name: First
+        m_NodeId: 66d02f56-4bc3-4da1-8314-6376efecaa7b
+        m_Index: 0
+        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        m_ConnectionId: c76e6ae6-b40c-44ef-8d9a-4c56b91d25b5
+    - rid: 6174426418998935556
+      type: {class: InPort, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Name: Second
+        m_NodeId: 66d02f56-4bc3-4da1-8314-6376efecaa7b
+        m_Index: 1
+        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        m_ConnectionId: 6d7728cb-4a1f-437f-9e90-8ab25c45619d
+    - rid: 6174426418998935557
+      type: {class: OutPort, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Name: Value
+        m_NodeId: 66d02f56-4bc3-4da1-8314-6376efecaa7b
+        m_Index: 0
+        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        m_ConnectionIds:
+        - 8c8b7831-f9b9-4c9c-b204-3b207547af17
+    - rid: 6174426418998935558
+      type: {class: Connection, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Id: 8c8b7831-f9b9-4c9c-b204-3b207547af17
+        m_FromPort:
+          rid: 6174426418998935557
+        m_ToPort:
+          rid: 6174426418998935553
+    - rid: 6174426420277411840
+      type: {class: ValueNode, ns: Calculator, asm: Assembly-CSharp}
+      data:
+        m_Id: 5c4171df-00d1-46fe-a3ea-bda36957967f
+        m_Position:
+          serializedVersion: 2
+          x: 138
+          y: 179
+          width: 212
+          height: 125
+        m_DepthLevel: 0
+        m_Expanded: 1
+        m_InPorts: []
+        m_OutPorts:
+        - rid: 6174426420277411841
+        Value: 0
+        Logger: {fileID: 0}
+        Input: 0
+    - rid: 6174426420277411841
+      type: {class: OutPort, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Name: Value
+        m_NodeId: 5c4171df-00d1-46fe-a3ea-bda36957967f
+        m_Index: 0
+        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        m_ConnectionIds:
+        - c76e6ae6-b40c-44ef-8d9a-4c56b91d25b5
+    - rid: 6174426420277411842
+      type: {class: Connection, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Id: c76e6ae6-b40c-44ef-8d9a-4c56b91d25b5
+        m_FromPort:
+          rid: 6174426420277411841
+        m_ToPort:
+          rid: 6174426418998935555
+    - rid: 6174426420277411843
+      type: {class: ValueNode, ns: Calculator, asm: Assembly-CSharp}
+      data:
+        m_Id: 862207ac-4b32-4940-a4f3-eb05aa634dc2
+        m_Position:
+          serializedVersion: 2
+          x: 138
+          y: 384
+          width: 212
+          height: 125
+        m_DepthLevel: 0
+        m_Expanded: 1
+        m_InPorts: []
+        m_OutPorts:
+        - rid: 6174426420277411844
+        Value: 0
+        Logger: {fileID: 0}
+        Input: 0
+    - rid: 6174426420277411844
+      type: {class: OutPort, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Name: Value
+        m_NodeId: 862207ac-4b32-4940-a4f3-eb05aa634dc2
+        m_Index: 0
+        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        m_ConnectionIds:
+        - 6d7728cb-4a1f-437f-9e90-8ab25c45619d
+    - rid: 6174426420277411845
+      type: {class: Connection, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Id: 6d7728cb-4a1f-437f-9e90-8ab25c45619d
+        m_FromPort:
+          rid: 6174426420277411844
+        m_ToPort:
+          rid: 6174426418998935556
+--- !u!4 &1426666463
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1426666461}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1510563374
 GameObject:
   m_ObjectHideFlags: 0
@@ -1092,3 +1303,4 @@ SceneRoots:
   - {fileID: 279511792}
   - {fileID: 430562709}
   - {fileID: 1021445980}
+  - {fileID: 1426666463}
