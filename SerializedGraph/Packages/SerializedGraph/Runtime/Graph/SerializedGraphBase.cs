@@ -79,6 +79,7 @@ namespace GiftHorse.SerializedGraphs
             foreach (var connection in m_Connections)
                 connection.Init(NodesById);
 
+            SortNodesByDepthLevel();
             OnStart();
         }
 
@@ -176,8 +177,7 @@ namespace GiftHorse.SerializedGraphs
             if (!TryConnectPorts(fromPort, toPort, out var connection)) 
                 return;
             
-            UpdateDependencyLevels(toNode);
-            SortNodesByDepthLevel();
+            UpdateDepthLevels(toNode);
             OnConnectionCreated(fromNode, fromPort, toNode, toPort);
         }
         
@@ -205,8 +205,7 @@ namespace GiftHorse.SerializedGraphs
             if (!TryDisconnectPorts(fromPort, toPort))
                 return;
             
-            UpdateDependencyLevels(toNode);
-            SortNodesByDepthLevel();
+            UpdateDepthLevels(toNode);
             OnConnectionRemoved(fromNode, fromPort, toNode, toPort);
         }
 
@@ -379,16 +378,16 @@ namespace GiftHorse.SerializedGraphs
             return true;
         }
         
-        private void UpdateDependencyLevels(ISerializedNode node)
+        private void UpdateDepthLevels(ISerializedNode node)
         {
             if (!m_VisitedNodes.Any())
                 m_VisitedNodes.Clear();
 
-            UpdateDependencyLevelsRecursively(node);
+            UpdateDepthLevelsRecursively(node);
             m_VisitedNodes.Clear();
         }
 
-        private void UpdateDependencyLevelsRecursively(ISerializedNode node)
+        private void UpdateDepthLevelsRecursively(ISerializedNode node)
         {
             if (m_VisitedNodes.Contains(node.Id))
                 return;
@@ -422,7 +421,7 @@ namespace GiftHorse.SerializedGraphs
                     if (!TryGetOutputNode(connectionId, out ISerializedNode outNode))
                         continue;
 
-                    UpdateDependencyLevelsRecursively(outNode);
+                    UpdateDepthLevelsRecursively(outNode);
                 }
             }
         }

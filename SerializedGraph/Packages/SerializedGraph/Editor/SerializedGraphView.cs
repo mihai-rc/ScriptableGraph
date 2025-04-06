@@ -89,6 +89,8 @@ namespace GiftHorse.SerializedGraphs.Editor
 
             AddNodeToGraph(node);
             this.Bind(m_Context.SerializedObject);
+
+            m_Context.MarkAssetAsDirty();
         }
 
         private void LoadUssFile()

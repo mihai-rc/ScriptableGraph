@@ -187,7 +187,6 @@ namespace GiftHorse.SerializedGraphs.Editor
             var propertyField = new PropertyField(property);
             propertyField.name = k_PropertyFieldName;
             propertyField.bindingPath = property.propertyPath;
-            propertyField.Bind(property.serializedObject);
             
             m_PropertiesHolder.Add(propertyField);
         }
