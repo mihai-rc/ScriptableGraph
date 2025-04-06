@@ -25,11 +25,12 @@ namespace GiftHorse.SerializedGraphs
         [SerializeReference] private List<InPort> m_InPorts;
         [SerializeReference] private List<OutPort> m_OutPorts;
 
+        private string m_Name;
         private string m_Title;
         private bool m_Initialized;
 
         /// <inheritdoc />
-        public SerializedGraphBase Graph { get; private set; }
+        public ISerializedGraph Graph { get; private set; }
 
         /// <inheritdoc />
         public string Id => m_Id;
@@ -102,13 +103,14 @@ namespace GiftHorse.SerializedGraphs
         protected virtual void OnDispose() { }
 
         /// <inheritdoc />
-        public void Init(SerializedGraphBase graph)
+        public void Init(string name, ISerializedGraph graph)
         {
             if (m_Initialized)
                 return;
 
-            m_Initialized = true;
+            m_Name = name;
             Graph = graph;
+            m_Initialized = true;
 
             OnInit();
         }
@@ -118,7 +120,7 @@ namespace GiftHorse.SerializedGraphs
         {
             if (!m_Initialized)
             {
-                Debug.LogErrorFormat(k_NodeNotInitialized, Graph.name, m_Id);
+                Debug.LogErrorFormat(k_NodeNotInitialized, m_Name, m_Id);
                 return;
             }
 
@@ -152,7 +154,7 @@ namespace GiftHorse.SerializedGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_InPortNameNotFound, Graph.name, m_Id, inputName);
+            Debug.LogErrorFormat(k_InPortNameNotFound, m_Name, m_Id, inputName);
 
             return false;
         }
@@ -170,7 +172,7 @@ namespace GiftHorse.SerializedGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_OutPortNameNotFound, Graph.name, m_Id, outputName);
+            Debug.LogErrorFormat(k_OutPortNameNotFound, m_Name, m_Id, outputName);
 
             return false;
         }
@@ -185,7 +187,7 @@ namespace GiftHorse.SerializedGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_OutOfBoundsInPortIndex, Graph.name, m_Id, index);
+            Debug.LogErrorFormat(k_OutOfBoundsInPortIndex, m_Name, m_Id, index);
 
             return false;
         }
@@ -200,7 +202,7 @@ namespace GiftHorse.SerializedGraphs
             }
 
             port = null;
-            Debug.LogErrorFormat(k_OutOfBoundsOutPortIndex, Graph.name, m_Id, index);
+            Debug.LogErrorFormat(k_OutOfBoundsOutPortIndex, m_Name, m_Id, index);
 
             return false;
         }
@@ -210,7 +212,7 @@ namespace GiftHorse.SerializedGraphs
         {
             if (TryGetInPort(portName, out var inPort)) 
                 return Graph.TryGetInputNode(inPort.ConnectionId, out node);
-            
+
             node = null;
             return false;
         }
@@ -220,12 +222,12 @@ namespace GiftHorse.SerializedGraphs
         {
             if (!TryGetOutPort(portName, out var outPort))
                 return false;
-            
+
             foreach (var connectionId in outPort.ConnectionIds)
             {
                 if (!Graph.TryGetOutputNode(connectionId, out ISerializedNode node))
                     continue;
-                
+
                 nodes.Add(node);
             }
 

@@ -20,10 +20,10 @@ namespace GiftHorse.SerializedGraphs
             get => m_ConnectionId;
             set => m_ConnectionId = value;
         }
-        
+
         /// <inheritdoc />
         public override bool IsEmpty => string.IsNullOrEmpty(m_ConnectionId);
-        
+
         /// <summary>
         /// <see cref="InPort"/> constructor.
         /// </summary>

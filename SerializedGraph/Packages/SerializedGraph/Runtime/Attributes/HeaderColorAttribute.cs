@@ -12,7 +12,7 @@ namespace GiftHorse.SerializedGraphs.Attributes
         /// The header's color.
         /// </summary>
         public Color Color { get; }
-        
+
         /// <summary>
         /// <see cref="HeaderColorAttribute"/>'s constructor.
         /// </summary>

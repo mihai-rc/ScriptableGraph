@@ -91,7 +91,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         {
             m_GraphHierarchyPath = GetHierarchyPath(graph);
             EditorSceneManager.activeSceneChangedInEditMode += OnSceneChanged;
-            
+
             CreateGraph(graph);
         }
 
@@ -111,7 +111,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         {
             if (m_Scene == to)
                 return;
-            
+
             CloseWindow();
         }
 

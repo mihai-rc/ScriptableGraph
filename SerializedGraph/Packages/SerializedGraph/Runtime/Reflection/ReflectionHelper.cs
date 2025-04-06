@@ -36,7 +36,7 @@ namespace GiftHorse.SerializedGraphs
         /// <param name="node"> The node whose ports are being fetched. </param>
         /// <param name="inPorts"> Out reference of the list containing all the input ports. </param>
         /// <param name="outPorts"> Out reference of the list containing all the output ports. </param>
-        public static void GetNodePorts(SerializedNodeBase node, out List<InPort> inPorts, out List<OutPort> outPorts)
+        public static void GetNodePorts(ISerializedNode node, out List<InPort> inPorts, out List<OutPort> outPorts)
         {
             inPorts = null;
             outPorts = null;
@@ -59,10 +59,10 @@ namespace GiftHorse.SerializedGraphs
                 .Select((fieldInfo, index) => CreateOutPort(fieldInfo, node.Id, index))
                 .ToList();
         }
-        
+
         private static bool IsSubclassOfNode(Type type)
         {
-            if (type.IsSubclassOf(typeof(SerializedNodeBase))) 
+            if (type.GetInterfaces().Contains(typeof(ISerializedNode))) 
                 return true;
 
             Debug.LogErrorFormat(k_NotSubTypeOfSerializedNode, type.FullName);

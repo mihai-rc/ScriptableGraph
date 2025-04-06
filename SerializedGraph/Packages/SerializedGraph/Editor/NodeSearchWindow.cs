@@ -26,7 +26,7 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private SerializedGraphWindow m_Window;
         private SerializedGraphView m_GraphView;
-        private SerializedGraphBase m_Graph;
+        private ISerializedGraph m_Graph;
 
         /// <summary>
         /// Initializes the search window with the context of the graph editor.

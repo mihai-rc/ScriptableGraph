@@ -12,7 +12,7 @@ namespace GiftHorse.SerializedGraphs.Attributes
         /// The path to the node's type in the search window tree.
         /// </summary>
         public string SearchPath { get; set; }
-        
+
         /// <summary>
         /// Whether the node should be excluded from search window or not.
         /// </summary>

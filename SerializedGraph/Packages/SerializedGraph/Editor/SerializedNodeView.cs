@@ -53,7 +53,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             // Remove the delete capability
             if (ReflectionHelper.IsNodeExcludedFromSearch(node.GetType()))
                 capabilities &= ~Capabilities.Deletable;
-            
+
             CreateInputs();
             CreateOutputs();
             InitializeNodeByReflection();
@@ -70,7 +70,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         protected override void ToggleCollapse()
         {
             base.ToggleCollapse();
-            
+
             m_SerializedNode.Expanded = expanded;
             m_Context.MarkAssetAsDirty();
         }
@@ -86,14 +86,14 @@ namespace GiftHorse.SerializedGraphs.Editor
         private SerializedProperty InitializeSerializedProperty()
         {
             m_Context.SerializedObject.Update();
-            
+
             var nodes = m_Context.SerializedObject.FindProperty(k_NodesProperty);
             if (!nodes.isArray)
             {
                 Debug.LogErrorFormat(k_SerializedPropertyNotFoundError, name, m_SerializedNode.Id);
                 return null;
             }
-            
+
             var size = nodes.arraySize;
             for (var i = 0; i < size; i++)
             {
@@ -114,10 +114,10 @@ namespace GiftHorse.SerializedGraphs.Editor
         {
             name = m_SerializedNode.Title;
             title = m_SerializedNode.Title;
-            
+
             if (!ReflectionHelper.TryGetNodeHeaderColor(type, out var color)) 
                 return;
-            
+
             titleContainer.style.backgroundColor = new StyleColor(color);
             titleContainer.style.unityFontStyleAndWeight = FontStyle.Bold;
         }
@@ -148,7 +148,7 @@ namespace GiftHorse.SerializedGraphs.Editor
                 m_PropertiesHolder ??= InitializePropertiesHolder();
                 DrawProperty(propertyName);
             }
-            
+
             extensionContainer.Add(m_PropertiesHolder);
             RefreshExpandedState();
         }
@@ -158,7 +158,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             var capacity = multiple ? Port.Capacity.Multi : Port.Capacity.Single;
             var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, capacity, portType);
             inputPort.portName = portName;
-            
+
             InPorts.Add(inputPort);
             inputContainer.Add(inputPort);
         }
@@ -168,7 +168,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             var capacity = multiple ? Port.Capacity.Multi : Port.Capacity.Single;
             var outputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, capacity, portType);
             outputPort.portName = portName;
-            
+
             OutPorts.Add(outputPort);
             outputContainer.Add(outputPort);
         }
@@ -176,18 +176,18 @@ namespace GiftHorse.SerializedGraphs.Editor
         private void DrawProperty(string propertyName)
         {
             m_SerializedProperty ??= InitializeSerializedProperty();
-            
+
             var property = m_SerializedProperty.FindPropertyRelative(propertyName);
             if (property is null)
             {
                 Debug.LogErrorFormat(k_InvalidNodeProperty, propertyName);
                 return;
             }
-            
+
             var propertyField = new PropertyField(property);
             propertyField.name = k_PropertyFieldName;
             propertyField.bindingPath = property.propertyPath;
-            
+
             m_PropertiesHolder.Add(propertyField);
         }
     }

@@ -10,22 +10,22 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// Reference to the graph component.
         /// </summary>
         public SerializedGraphBase Graph { get; private set; }
-        
+
         /// <summary>
         /// The <see cref="SerializedGraphView"/> that edits the <see cref="SerializedGraphBase"/>.
         /// </summary>
         public SerializedGraphView GraphView { get; private set; }
-        
+
         /// <summary>
         /// The serialized object of the <see cref="SerializedGraphBase"/>.
         /// </summary>
         public SerializedObject SerializedObject { get; private set; }
-        
+
         /// <summary>
         /// The editor window that contains the <see cref="SerializedGraphView"/>.
         /// </summary>
         public SerializedGraphWindow Window { get; }
-        
+
         /// <summary>
         /// Whether the graph has unsaved changes or not.
         /// </summary>
@@ -61,7 +61,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             {
                 SearchWindow.Open(new SearchWindowContext(request.screenMousePosition), m_SearchWindow);
             };
-            
+
             m_SearchWindow = ScriptableObject.CreateInstance<NodeSearchWindow>();
             m_SearchWindow.Init(this);
             
@@ -78,7 +78,7 @@ namespace GiftHorse.SerializedGraphs.Editor
                 if (Window.TryGetSerializedGraph(out var graph))
                     Graph = graph;
             }
-                
+
             EditorUtility.SetDirty(Graph);
         }
     }

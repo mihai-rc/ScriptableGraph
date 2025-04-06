@@ -27,7 +27,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             {
                 SerializedGraphWindow.Open(target as SerializedGraphBase);
             }
-            
+
             GUI.enabled = false;
             base.OnInspectorGUI();
             GUI.enabled = true;

@@ -21,7 +21,7 @@ namespace GiftHorse.SerializedGraphs
         
         /// <inheritdoc />
         public override bool IsEmpty => !m_ConnectionIds?.Any() ?? true;
-        
+
         /// <summary>
         /// <see cref="OutPort"/> constructor.
         /// </summary>

@@ -10,9 +10,9 @@ namespace GiftHorse.SerializedGraphs
     public interface ISerializedNode : IDisposable
     {
         /// <summary>
-        /// Reference to the <see cref="SerializedGraphBase"/> that owns this <see cref="ISerializedNode"/>.
+        /// Reference to the <see cref="ISerializedGraph"/> that owns this <see cref="ISerializedNode"/>.
         /// </summary>
-        SerializedGraphBase Graph { get; }
+        ISerializedGraph Graph { get; }
 
         /// <summary>
         /// The id of this node.
@@ -53,8 +53,9 @@ namespace GiftHorse.SerializedGraphs
         /// <summary>
         /// Initializes the node and its ports.
         /// </summary>
-        /// <param name="graph"> The <see cref="SerializedGraphBase"/> the owns this node. </param>
-        void Init(SerializedGraphBase graph);
+        /// <param name="name"> The name of the graph. </param>
+        /// <param name="graph"> The <see cref="ISerializedGraph"/> the owns this node. </param>
+        void Init(string name, ISerializedGraph graph);
 
         /// <summary>
         /// Processes the node.

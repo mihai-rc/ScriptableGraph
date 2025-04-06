@@ -70,7 +70,7 @@ namespace GiftHorse.SerializedGraphs
         /// <see cref="ISerializedNode"/> to the output field of the emitting <see cref="ISerializedNode"/>.
         /// </returns>
         /// <remarks>
-        /// In order for this to work, the fields of the nodes must be public and the <see cref="SerializedGraphBase.Nodes"/>
+        /// In order for this to work, the fields of the nodes must be public and the <see cref="ISerializedGraph.Nodes"/>
         /// should be kept sorted by their Depth Level thus the output field is always assigned before the input field.
         /// TODO: Make sure that this approach works well with Apple policies. If not, change the solution to use code generation to achieve the same result.
         /// </remarks>

@@ -13,7 +13,7 @@ namespace GiftHorse.SerializedGraphs
         [SerializeField] private string m_NodeId;
         [SerializeField] private int m_Index;
         [SerializeField] private string m_CompatibleType;
-        
+
         /// <summary>
         /// Returns true if the port is not part of any <see cref="Connection"/>, otherwise it returns false.
         /// </summary>
@@ -33,7 +33,7 @@ namespace GiftHorse.SerializedGraphs
         /// The index of this port in the <see cref="ISerializedNode"/>'s input or output ports list.
         /// </summary>
         public int Index => m_Index;
-        
+
         /// <summary>
         /// The assembly qualified name of the type this port is compatible with.
         /// </summary>

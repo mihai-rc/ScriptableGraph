@@ -8,7 +8,7 @@ namespace GiftHorse.SerializedGraphs
     /// Serialized Graph components base class.
     /// </summary>
     [DisallowMultipleComponent]
-    public abstract class SerializedGraphBase : MonoBehaviour
+    public abstract class SerializedGraphBase : MonoBehaviour, ISerializedGraph
     {
         private const string k_SceneNotLoaded = "[SerializedGraph] The graph: {0} cannot be interacted with when its parent scene: {1} is not loaded!";
         private const string k_PortsAlreadyConnected = "[SerializedGraph] Trying to connect two ports that are already connected! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
@@ -26,23 +26,17 @@ namespace GiftHorse.SerializedGraphs
         private Dictionary<string, Connection> m_ConnectionsById;
         private readonly HashSet<string> m_VisitedNodes = new();
 
-        /// <summary>
-        /// The Assembly Qualified Name of the node's specialized base type that implements from <see cref="ISerializedNode"/>.
-        /// </summary>
+        /// <inheritdoc />
         public abstract string NodesBaseType { get; }
 
-        /// <summary>
-        /// Collection of all <see cref="ISerializedNode"/>s sorted in the order of execution.
-        /// </summary>
+        /// <inheritdoc />
         public IEnumerable<ISerializedNode> Nodes => m_Nodes;
 
-        /// <summary>
-        /// Collection of all <see cref="Connection"/>s.
-        /// </summary>
+        /// <inheritdoc />
         public IEnumerable<Connection> Connections => m_Connections;
-        
+
         private bool IsSceneLoaded => gameObject.scene.isLoaded;
-        
+
         private Dictionary<string, ISerializedNode> NodesById
         {
             get
@@ -53,14 +47,14 @@ namespace GiftHorse.SerializedGraphs
                 return m_NodesById;
             }
         }
-        
+
         private Dictionary<string, Connection> ConnectionsById
         {
             get
             {
                 if (m_ConnectionsById is null)
                     m_ConnectionsById = m_Connections.ToDictionary(c => c.Id, c => c);
-                
+
                 return m_ConnectionsById;
             }
         }
@@ -74,7 +68,7 @@ namespace GiftHorse.SerializedGraphs
         private void Start()
         {
             foreach (var node in Nodes)
-                node.Init(this);
+                node.Init(name, this);
 
             foreach (var connection in m_Connections)
                 connection.Init(NodesById);
@@ -111,10 +105,8 @@ namespace GiftHorse.SerializedGraphs
         /// Callback called on the Start event of the <see cref="GameObject"/> the graph is attached to.
         /// </summary>
         protected virtual void OnStart() { }
-        
-        /// <summary>
-        /// Sorts the <see cref="ISerializedNode"/>s in the graph by their depth level.
-        /// </summary>
+
+        /// <inheritdoc />
         public void SortNodes()
         {
             m_Nodes.Sort((left, right) =>
@@ -125,20 +117,15 @@ namespace GiftHorse.SerializedGraphs
                 return 0;
             });
         }
-        
-        /// <summary>
-        /// Executes all <see cref="ISerializedNode"/>s processes.
-        /// </summary>
+
+        /// <inheritdoc />
         public void Process()
         {
             foreach (var node in Nodes)
                 node.Process();
         }
 
-        /// <summary>
-        /// Adds a <see cref="ISerializedNode"/> to the graph data structure.
-        /// </summary>
-        /// <param name="node"> The <see cref="ISerializedNode"/> to be added. </param>
+        /// <inheritdoc />
         public void AddNode(ISerializedNode node)
         {
             if (!IsSceneLoaded)
@@ -151,10 +138,7 @@ namespace GiftHorse.SerializedGraphs
             NodesById[node.Id] = node;
         }
 
-        /// <summary>
-        /// Removes the <see cref="ISerializedNode"/> from the graph data structure.
-        /// </summary>
-        /// <param name="node"> The <see cref="ISerializedNode"/> to be removed. </param>
+        /// <inheritdoc />
         public void RemoveNode(ISerializedNode node)
         {
             if (!IsSceneLoaded)
@@ -167,13 +151,7 @@ namespace GiftHorse.SerializedGraphs
             NodesById.Remove(node.Id);
         }
 
-        /// <summary>
-        /// Connects two <see cref="ISerializedNode"/>s at the specified port indices and stores the <see cref="Connection"/> in the graph data structure.
-        /// </summary>
-        /// <param name="fromNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> starts from. </param>
-        /// <param name="fromPortIndex"> The index of the port the <see cref="Connection"/> starts from. </param>
-        /// <param name="toNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> goes to. </param>
-        /// <param name="toPortIndex"> The index of the port the <see cref="Connection"/> goes to. </param>
+        /// <inheritdoc />
         public void ConnectNodes(ISerializedNode fromNode, int fromPortIndex, ISerializedNode toNode, int toPortIndex)
         {
             if (!IsSceneLoaded)
@@ -181,27 +159,21 @@ namespace GiftHorse.SerializedGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return;
             }
-            
+
             if (!fromNode.TryGetOutPort(fromPortIndex, out var fromPort)) 
                 return;
-            
+
             if (!toNode.TryGetInPort(toPortIndex, out var toPort)) 
                 return;
-            
+
             if (!TryConnectPorts(fromPort, toPort, out var connection)) 
                 return;
-            
+
             UpdateDepthLevels(toNode);
             OnConnectionCreated(fromNode, fromPort, toNode, toPort);
         }
-        
-        /// <summary>
-        /// Disconnects two <see cref="ISerializedNode"/>s at the specified port indices and removes the <see cref="Connection"/> from the graph data structure.
-        /// </summary>
-        /// <param name="fromNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> starts from. </param>
-        /// <param name="fromPortIndex"> The index of the port the <see cref="Connection"/> starts from. </param>
-        /// <param name="toNode"> Reference to the <see cref="ISerializedNode"/> the <see cref="Connection"/> goes to. </param>
-        /// <param name="toPortIndex"> The index of the port the <see cref="Connection"/> goes to. </param>
+
+        /// <inheritdoc />
         public void DisconnectNodes(ISerializedNode fromNode, int fromPortIndex, ISerializedNode toNode, int toPortIndex)
         {
             if (!IsSceneLoaded)
@@ -209,36 +181,28 @@ namespace GiftHorse.SerializedGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return;
             }
-            
+
             if (!fromNode.TryGetOutPort(fromPortIndex, out var fromPort)) 
                 return;
-            
+
             if (!toNode.TryGetInPort(toPortIndex, out var toPort)) 
                 return;
-            
+
             if (!TryDisconnectPorts(fromPort, toPort))
                 return;
-            
+
             UpdateDepthLevels(toNode);
             OnConnectionRemoved(fromNode, fromPort, toNode, toPort);
         }
 
-        /// <summary>
-        /// Updates <see cref="ISerializedNode"/>s and <see cref="Connection"/>s mappings on editor undo.
-        /// </summary>
+        /// <inheritdoc />
         public void UpdateMappings()
         {
             m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n);
             m_ConnectionsById = m_Connections.ToDictionary(c => c.Id, c => c);
         }
 
-        /// <summary>
-        /// Tries to get a <see cref="ISerializedNode"/> by its id.
-        /// </summary>
-        /// <param name="nodeId"> The id of the node. </param>
-        /// <param name="node"> The reference to the corresponding node. Is null if the id was not found. </param>
-        /// <typeparam name="T"> The subtype the node is expected te be received as. </typeparam>
-        /// <returns> Returns true if the node was found, otherwise returns false. </returns>
+        /// <inheritdoc />
         public bool TryGetNodeById<T>(string nodeId, out T node) where T : class, ISerializedNode
         {
             node = null;
@@ -247,7 +211,7 @@ namespace GiftHorse.SerializedGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return false;
             }
-            
+
             if (NodesById.TryGetValue(nodeId, out var serializedNode))
             {
                 if (serializedNode is not T castedNode)
@@ -255,22 +219,16 @@ namespace GiftHorse.SerializedGraphs
                     Debug.LogErrorFormat(k_NodeCastFailed, nodeId, typeof(T).Name, name);
                     return false;
                 }
-                
+
                 node = castedNode;
                 return true;
             }
-            
+
             Debug.LogErrorFormat(k_NodeNotFound, nodeId, name);
             return false;
         }
 
-        /// <summary>
-        /// Tries to get the origin <see cref="ISerializedNode"/> of a <see cref="Connection"/>.
-        /// </summary>
-        /// <param name="connectionId"> The id of the <see cref="Connection"/>. </param>
-        /// <param name="node"> The reference to the origin node. Is null if the node was not found. </param>
-        /// <typeparam name="T"> The subtype the node is expected te be received as. </typeparam>
-        /// <returns> Returns true if the node was found, otherwise returns false. </returns>
+        /// <inheritdoc />
         public bool TryGetInputNode<T>(string connectionId, out T node) where T : class, ISerializedNode
         {
             node = null;
@@ -279,23 +237,17 @@ namespace GiftHorse.SerializedGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return false;
             }
-            
+
             if (!TryGetConnectionById(connectionId, out var connection))
                 return false;
-            
+
             if (!TryGetNodeById(connection.FromPort.NodeId, out node))
                 return false;
-            
+
             return true;
         }
 
-        /// <summary>
-        /// Tries to get the destination <see cref="ISerializedNode"/> of a <see cref="Connection"/>.
-        /// </summary>
-        /// <param name="connectionId"> The id of the <see cref="Connection"/>. </param>
-        /// <param name="node"> The reference to the destination node. Is null if the node was not found. </param>
-        /// <typeparam name="T"> The subtype the node is expected te be received as. </typeparam>
-        /// <returns> Returns true if the node was found, otherwise returns false. </returns>
+        /// <inheritdoc />
         public bool TryGetOutputNode<T>(string connectionId, out T node) where T : class, ISerializedNode
         {
             node = null;
@@ -304,22 +256,17 @@ namespace GiftHorse.SerializedGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return false;
             }
-            
+
             if (!TryGetConnectionById(connectionId, out var connection))
                 return false;
-            
+
             if (!TryGetNodeById(connection.ToPort.NodeId, out node))
                 return false;
-            
+
             return true;
         }
 
-        /// <summary>
-        /// Tries to get a <see cref="Connection"/> by its id.
-        /// </summary>
-        /// <param name="connectionId"> The id of the <see cref="Connection"/>. </param>
-        /// <param name="connection"> The reference to the corresponding <see cref="Connection"/>. Is null if the id was not found. </param>
-        /// <returns> Returns true if the <see cref="Connection"/> was found, otherwise returns false. </returns>
+        /// <inheritdoc />
         public bool TryGetConnectionById(string connectionId, out Connection connection)
         {
             connection = null;
@@ -328,10 +275,10 @@ namespace GiftHorse.SerializedGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return false;
             }
-            
+
             if (ConnectionsById.TryGetValue(connectionId, out connection))
                 return true;
-            
+
             Debug.LogErrorFormat(k_ConnectionNotFound, connectionId, name);
             return false;
         }
@@ -342,7 +289,7 @@ namespace GiftHorse.SerializedGraphs
             {
                 Debug.LogErrorFormat(k_PortsAlreadyConnected, name, from.NodeId, to.NodeId);
                 connection = null;
-                
+
                 return false;
             }
 
@@ -350,7 +297,7 @@ namespace GiftHorse.SerializedGraphs
             {
                 Debug.LogErrorFormat(k_PortsTypeMismatch, name, from.NodeId, to.NodeId);
                 connection = null;
-                
+
                 return false;
             }
 
@@ -358,7 +305,7 @@ namespace GiftHorse.SerializedGraphs
             {
                 Debug.LogErrorFormat(k_PortsOfTheSameNode, name, from.Index, to.Index);
                 connection = null;
-                
+
                 return false;
             }
 
@@ -391,7 +338,7 @@ namespace GiftHorse.SerializedGraphs
 
             return true;
         }
-        
+
         private void UpdateDepthLevels(ISerializedNode node)
         {
             if (!m_VisitedNodes.Any())
@@ -409,13 +356,13 @@ namespace GiftHorse.SerializedGraphs
             // By traversing the subgraph of the inputs without accounting for the nodes that are connected in a circle
             // will result in the dependency level of those nodes to be evaluated as the inputs of the first visited node
             // of the circle, which can lead to some unexpected behavior.
-            
+
             int? maxDependencyLevel = null;
             foreach (var inPort in node.InPorts)
             {
                 if (inPort.IsEmpty)
                     continue;
-                
+
                 if (!TryGetInputNode(inPort.ConnectionId, out ISerializedNode inNode))
                     continue;
 
