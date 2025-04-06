@@ -27,6 +27,9 @@ namespace GiftHorse.SerializedGraphs
         private readonly HashSet<string> m_VisitedNodes = new();
 
         /// <inheritdoc />
+        public string Name { get; }
+
+        /// <inheritdoc />
         public abstract string NodesBaseType { get; }
 
         /// <inheritdoc />
@@ -43,7 +46,7 @@ namespace GiftHorse.SerializedGraphs
             {
                 if (m_NodesById is null)
                     m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n);
-                
+
                 return m_NodesById;
             }
         }
@@ -68,7 +71,7 @@ namespace GiftHorse.SerializedGraphs
         private void Start()
         {
             foreach (var node in Nodes)
-                node.Init(name, this);
+                node.Init(this);
 
             foreach (var connection in m_Connections)
                 connection.Init(NodesById);

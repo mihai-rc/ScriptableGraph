@@ -53,9 +53,8 @@ namespace GiftHorse.SerializedGraphs
         /// <summary>
         /// Initializes the node and its ports.
         /// </summary>
-        /// <param name="name"> The name of the graph. </param>
         /// <param name="graph"> The <see cref="ISerializedGraph"/> the owns this node. </param>
-        void Init(string name, ISerializedGraph graph);
+        void Init(ISerializedGraph graph);
 
         /// <summary>
         /// Processes the node.

@@ -8,6 +8,11 @@ namespace GiftHorse.SerializedGraphs
     public interface ISerializedGraph
     {
         /// <summary>
+        /// The name of the graph.
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
         /// The Assembly Qualified Name of the node's specialized base type that implements from <see cref="ISerializedNode"/>.
         /// </summary>
         string NodesBaseType { get; }
