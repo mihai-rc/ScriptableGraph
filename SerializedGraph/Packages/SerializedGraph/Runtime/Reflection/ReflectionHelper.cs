@@ -34,32 +34,30 @@ namespace GiftHorse.SerializedGraphs
         /// Gets the input and output ports of a node.
         /// </summary>
         /// <param name="node"> The node whose ports are being fetched. </param>
-        /// <param name="inPorts"> List to be populated with all the <see cref="InPort"/>s. </param>
-        /// <param name="outPorts"> List to be populated with all the <see cref="OutPort"/>s. </param>
-        /// TODO: Consider using lists from ListPool to avoid allocations.
-        public static void GetNodePorts(SerializedNodeBase node, List<InPort> inPorts, List<OutPort> outPorts)
+        /// <param name="inPorts"> Out reference of the list containing all the input ports. </param>
+        /// <param name="outPorts"> Out reference of the list containing all the output ports. </param>
+        public static void GetNodePorts(SerializedNodeBase node, out List<InPort> inPorts, out List<OutPort> outPorts)
         {
+            inPorts = null;
+            outPorts = null;
             var type = node.GetType();
-
-            if (!IsSubclassOfNode(type))
+            
+            if (!IsSubclassOfNode(type)) 
                 return;
 
             var fields = type.GetFields(k_BindingFlags);
-            for (var index = 0; index < fields.Length; index++)
-            {
-                var field = fields[index];
-                if (field.GetCustomAttribute<InputAttribute>() is not null)
-                {
-                    var inPort = new InPort(field.Name, node.Id, index, field.FieldType.AssemblyQualifiedName);
-                    inPorts.Add(inPort);
-                }
 
-                if (field.GetCustomAttribute<OutputAttribute>() is not null)
-                {
-                    var outPort = new OutPort(field.Name, node.Id, index, field.FieldType.AssemblyQualifiedName);
-                    outPorts.Add(outPort);
-                }
-            }
+            inPorts = fields
+                .Where(field => field
+                .GetCustomAttribute<InputAttribute>() is not null)
+                .Select((fieldInfo, index) => CreateInPort(fieldInfo, node.Id, index))
+                .ToList();
+
+            outPorts = fields
+                .Where(field => field
+                .GetCustomAttribute<OutputAttribute>() is not null)
+                .Select((fieldInfo, index) => CreateOutPort(fieldInfo, node.Id, index))
+                .ToList();
         }
         
         private static bool IsSubclassOfNode(Type type)
@@ -71,13 +69,18 @@ namespace GiftHorse.SerializedGraphs
             return false;
         }
 
+        private static InPort CreateInPort(FieldInfo fieldInfo, string nodeId, int index) => 
+            new(fieldInfo.Name, nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
+
+        private static OutPort CreateOutPort(FieldInfo fieldInfo, string nodeId, int index) => 
+            new(fieldInfo.Name, nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
+
 #if UNITY_EDITOR
         /// <summary>
         /// Returns a list of metadata tuples of all the nodes that are derived from the given base type.
         /// </summary>
         /// <param name="nodeBaseTypeName"> The assembly qualified name of the common base type of all nodes belonging to a graph. </param>
         /// <returns> A list of metadata tuples corresponding to each node search entry. </returns>
-        /// TODO: Consider using lists from ListPool to avoid allocations and maybe exposing the search entry type.
         public static List<(Type type, string title, string[] path)> GetNodeSearchEntries(string nodeBaseTypeName)
         {
             var nodeBaseType = Type.GetType(nodeBaseTypeName);
@@ -144,8 +147,8 @@ namespace GiftHorse.SerializedGraphs
 
             return type
                 .GetFields(k_BindingFlags)
-                .ToList()
-                .Where(fieldInfo => fieldInfo.GetCustomAttribute<NodeFieldAttribute>() is not null)
+                .Where(fieldInfo => fieldInfo
+                .GetCustomAttribute<NodeFieldAttribute>() is not null)
                 .Select(fieldInfo => fieldInfo.Name);
         }
 

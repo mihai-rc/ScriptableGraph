@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace GiftHorse.SerializedGraphs
 {
@@ -84,9 +83,7 @@ namespace GiftHorse.SerializedGraphs
             m_Id = Guid.NewGuid().ToString();
             m_Expanded = true;
 
-            m_InPorts = ListPool<InPort>.Get();
-            m_OutPorts = ListPool<OutPort>.Get();
-            ReflectionHelper.GetNodePorts(this, m_InPorts, m_OutPorts);
+            ReflectionHelper.GetNodePorts(this, out m_InPorts, out m_OutPorts);
         }
 
         /// <summary>
@@ -140,13 +137,7 @@ namespace GiftHorse.SerializedGraphs
         /// <summary>
         /// Releases the unmanaged resources used by the <see cref="ISerializedNode"/>.
         /// </summary>
-        public void Dispose()
-        {
-            ListPool<InPort>.Release(m_InPorts);
-            ListPool<OutPort>.Release(m_OutPorts);
-            
-            OnDispose();
-        }
+        public void Dispose() => OnDispose();
 
         /// <inheritdoc />
         public bool TryGetInPort(string inputName, out InPort port)
