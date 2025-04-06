@@ -41,17 +41,17 @@ namespace GiftHorse.SerializedGraphs
         public bool Expanded { get; set; }
 
         /// <summary>
-        /// Collection of all input ports of the node.
+        /// Collection of all <see cref="InPort"/>s of the node.
         /// </summary>
         IEnumerable<InPort> InPorts { get; }
 
         /// <summary>
-        /// Collection of all output ports of the node.
+        /// Collection of all <see cref="OutPort"/>s of the node.
         /// </summary>
         IEnumerable<OutPort> OutPorts { get; }
 
         /// <summary>
-        /// Initializes ports values and binds all references.
+        /// Initializes the node and its ports.
         /// </summary>
         /// <param name="graph"> The <see cref="SerializedGraphBase"/> the owns this node. </param>
         void Init(SerializedGraphBase graph);
@@ -62,35 +62,64 @@ namespace GiftHorse.SerializedGraphs
         void Process();
 
         /// <summary>
-        /// Tries to find the Input port with the provided name.
+        /// Tries to get the <see cref="InPort"/> with the provided name.
         /// </summary>
-        /// <param name="inputName"> Name of the port to be retrieved. </param>
+        /// <param name="inputName"> Name of the <see cref="InPort"/> to be retrieved. </param>
         /// <param name="port"> Reference of the retrieved port. Is null if the port was not found. </param>
-        /// <returns> Returns true if the port was found, otherwise returns false. </returns>
-        bool TryFindInPortByName(string inputName, out InPort port);
+        /// <returns> Whether the <see cref="InPort"/> was found or not. </returns>
+        bool TryGetInPort(string inputName, out InPort port);
 
         /// <summary>
-        /// Tries to find the Output port with the provided name.
+        /// Tries to get the <see cref="OutPort"/> with the provided name.
         /// </summary>
-        /// <param name="outputName"> Name of the port to be retrieved. </param>
+        /// <param name="outputName"> Name of the <see cref="OutPort"/> to be retrieved. </param>
         /// <param name="port"> Reference of the retrieved port. Is null if the port was not found. </param>
-        /// <returns> Returns true if the port was found, otherwise returns false. </returns>
-        bool TryFindOutPortByName(string outputName, out OutPort port);
+        /// <returns> Whether the <see cref="OutPort"/> was found or not. </returns>
+        bool TryGetOutPort(string outputName, out OutPort port);
 
         /// <summary>
-        /// Tries to get the Input port at the provided index.
+        /// Tries to get the <see cref="InPort"/> at the provided index.
         /// </summary>
-        /// <param name="index"> Index of the port to be retrieved. </param>
+        /// <param name="index"> Index of the <see cref="InPort"/> to be retrieved. </param>
         /// <param name="port"> Reference of the retrieved port. Is null if the port was not found. </param>
-        /// <returns> Returns true if the port was found, otherwise returns false. </returns>
-        public bool TryGetInPortByIndex(int index, out InPort port);
+        /// <returns> Whether the <see cref="InPort"/> was found or not. </returns>
+        public bool TryGetInPort(int index, out InPort port);
 
         /// <summary>
-        /// Tries to get the Output port at the provided index.
+        /// Tries to get the <see cref="OutPort"/> at the provided index.
         /// </summary>
-        /// <param name="index"> Index of the port to be retrieved. </param>
+        /// <param name="index"> Index of the <see cref="OutPort"/> to be retrieved. </param>
         /// <param name="port"> Reference of the retrieved port. Is null if the port was not found. </param>
-        /// <returns> Returns true if the port was found, otherwise returns false. </returns>
-        public bool TryGetOutPortByIndex(int index, out OutPort port);
+        /// <returns> Whether the <see cref="OutPort"/> was found or not. </returns>
+        public bool TryGetOutPort(int index, out OutPort port);
+
+        /// <summary>
+        /// Tries to get the node connected to the <see cref="InPort"/> with the provided name.
+        /// </summary>
+        /// <param name="portName">
+        /// Name of the <see cref="InPort"/> whose connected node is being fetched.
+        /// </param>
+        /// <param name="node">
+        /// Reference to the node connected to the specified <see cref="InPort"/>.
+        /// Is null if the port name is invalid or the port is not connected.
+        /// </param>
+        /// <returns>
+        /// Whether the node was found or not.
+        /// </returns>
+        public bool TryGetInputNodeOf(string portName, out ISerializedNode node);
+
+        /// <summary>
+        /// Tries to get the nodes connected to the <see cref="OutPort"/> with the provided name.
+        /// </summary>
+        /// <param name="portName">
+        /// Name of the <see cref="OutPort"/> whose connected nodes are being fetched.
+        /// </param>
+        /// <param name="nodes">
+        /// List to be populated with nodes connected to the specified <see cref="OutPort"/>.
+        /// </param>
+        /// <returns>
+        /// Whether the nodes were found or not.
+        /// </returns>
+        public bool TryGetOutputNodesOf(string portName, List<ISerializedNode> nodes);
     }
 }

@@ -34,28 +34,32 @@ namespace GiftHorse.SerializedGraphs
         /// Gets the input and output ports of a node.
         /// </summary>
         /// <param name="node"> The node whose ports are being fetched. </param>
-        /// <param name="inPorts"> Out reference of the list containing all the input ports. </param>
-        /// <param name="outPorts"> Out reference of the list containing all the output ports. </param>
+        /// <param name="inPorts"> List to be populated with all the <see cref="InPort"/>s. </param>
+        /// <param name="outPorts"> List to be populated with all the <see cref="OutPort"/>s. </param>
         /// TODO: Consider using lists from ListPool to avoid allocations.
-        public static void GetNodePorts(SerializedNodeBase node, out List<InPort> inPorts, out List<OutPort> outPorts)
+        public static void GetNodePorts(SerializedNodeBase node, List<InPort> inPorts, List<OutPort> outPorts)
         {
             var type = node.GetType();
-            var fields = type
-                .GetFields(k_BindingFlags)
-                .ToList()
-                .Where(_ => IsSubclassOfNode(type));
 
-            inPorts = fields
-                .Where(field => field
-                .GetCustomAttribute<InputAttribute>() is not null)
-                .Select((fieldInfo, index) => CreateInPort(fieldInfo, node.Id, index))
-                .ToList();
+            if (!IsSubclassOfNode(type))
+                return;
 
-            outPorts = fields
-                .Where(field => field
-                .GetCustomAttribute<OutputAttribute>() is not null)
-                .Select((fieldInfo, index) => CreateOutPort(fieldInfo, node.Id, index))
-                .ToList();
+            var fields = type.GetFields(k_BindingFlags);
+            for (var index = 0; index < fields.Length; index++)
+            {
+                var field = fields[index];
+                if (field.GetCustomAttribute<InputAttribute>() is not null)
+                {
+                    var inPort = new InPort(field.Name, node.Id, index, field.FieldType.AssemblyQualifiedName);
+                    inPorts.Add(inPort);
+                }
+
+                if (field.GetCustomAttribute<OutputAttribute>() is not null)
+                {
+                    var outPort = new OutPort(field.Name, node.Id, index, field.FieldType.AssemblyQualifiedName);
+                    outPorts.Add(outPort);
+                }
+            }
         }
         
         private static bool IsSubclassOfNode(Type type)
@@ -66,12 +70,6 @@ namespace GiftHorse.SerializedGraphs
             Debug.LogErrorFormat(k_NotSubTypeOfSerializedNode, type.FullName);
             return false;
         }
-
-        private static InPort CreateInPort(FieldInfo fieldInfo, string nodeId, int index) => 
-            new(fieldInfo.Name, nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
-
-        private static OutPort CreateOutPort(FieldInfo fieldInfo, string nodeId, int index) => 
-            new(fieldInfo.Name, nodeId, index, fieldInfo.FieldType.AssemblyQualifiedName);
 
 #if UNITY_EDITOR
         /// <summary>
@@ -147,8 +145,7 @@ namespace GiftHorse.SerializedGraphs
             return type
                 .GetFields(k_BindingFlags)
                 .ToList()
-                .Where(fieldInfo => IsSubclassOfNode(type) && fieldInfo
-                .GetCustomAttribute<NodeFieldAttribute>() is not null)
+                .Where(fieldInfo => fieldInfo.GetCustomAttribute<NodeFieldAttribute>() is not null)
                 .Select(fieldInfo => fieldInfo.Name);
         }
 
@@ -156,12 +153,12 @@ namespace GiftHorse.SerializedGraphs
         {
             return nodeMetadata.attribute is not null && !nodeMetadata.attribute.ExcludeFromSearch;
         }
-        
+
         private static string BeautifyTitle(string title)
         {
             var titleWithoutSuffix = Regex.Replace(title, "Node$", "");
             var titleWithSpaces = Regex.Replace(titleWithoutSuffix, "([a-z])([A-Z])", "$1 $2");
-            
+
             return titleWithSpaces;
         }
 #endif

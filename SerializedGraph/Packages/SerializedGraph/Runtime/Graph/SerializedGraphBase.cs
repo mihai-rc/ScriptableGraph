@@ -79,7 +79,7 @@ namespace GiftHorse.SerializedGraphs
             foreach (var connection in m_Connections)
                 connection.Init(NodesById);
 
-            SortNodesByDepthLevel();
+            SortNodes();
             OnStart();
         }
 
@@ -111,6 +111,20 @@ namespace GiftHorse.SerializedGraphs
         /// Callback called on the Start event of the <see cref="GameObject"/> the graph is attached to.
         /// </summary>
         protected virtual void OnStart() { }
+        
+        /// <summary>
+        /// Sorts the <see cref="ISerializedNode"/>s in the graph by their depth level.
+        /// </summary>
+        public void SortNodes()
+        {
+            m_Nodes.Sort((left, right) =>
+            {
+                if (left.DepthLevel < right.DepthLevel) return -1;
+                if (left.DepthLevel > right.DepthLevel) return  1;
+
+                return 0;
+            });
+        }
         
         /// <summary>
         /// Executes all <see cref="ISerializedNode"/>s processes.
@@ -168,10 +182,10 @@ namespace GiftHorse.SerializedGraphs
                 return;
             }
             
-            if (!fromNode.TryGetOutPortByIndex(fromPortIndex, out var fromPort)) 
+            if (!fromNode.TryGetOutPort(fromPortIndex, out var fromPort)) 
                 return;
             
-            if (!toNode.TryGetInPortByIndex(toPortIndex, out var toPort)) 
+            if (!toNode.TryGetInPort(toPortIndex, out var toPort)) 
                 return;
             
             if (!TryConnectPorts(fromPort, toPort, out var connection)) 
@@ -196,10 +210,10 @@ namespace GiftHorse.SerializedGraphs
                 return;
             }
             
-            if (!fromNode.TryGetOutPortByIndex(fromPortIndex, out var fromPort)) 
+            if (!fromNode.TryGetOutPort(fromPortIndex, out var fromPort)) 
                 return;
             
-            if (!toNode.TryGetInPortByIndex(toPortIndex, out var toPort)) 
+            if (!toNode.TryGetInPort(toPortIndex, out var toPort)) 
                 return;
             
             if (!TryDisconnectPorts(fromPort, toPort))
@@ -234,9 +248,9 @@ namespace GiftHorse.SerializedGraphs
                 return false;
             }
             
-            if (NodesById.TryGetValue(nodeId, out var nodeBase))
+            if (NodesById.TryGetValue(nodeId, out var serializedNode))
             {
-                if (nodeBase is not T castedNode)
+                if (serializedNode is not T castedNode)
                 {
                     Debug.LogErrorFormat(k_NodeCastFailed, nodeId, typeof(T).Name, name);
                     return false;
@@ -424,17 +438,6 @@ namespace GiftHorse.SerializedGraphs
                     UpdateDepthLevelsRecursively(outNode);
                 }
             }
-        }
-
-        private void SortNodesByDepthLevel()
-        {
-            m_Nodes.Sort((left, right) =>
-            {
-                if (left.DepthLevel < right.DepthLevel) return -1;
-                if (left.DepthLevel > right.DepthLevel) return  1;
-
-                return 0;
-            });
         }
     }
 }

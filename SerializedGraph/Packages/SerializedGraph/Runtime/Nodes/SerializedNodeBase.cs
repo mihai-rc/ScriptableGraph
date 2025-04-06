@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace GiftHorse.SerializedGraphs
 {
@@ -53,18 +55,14 @@ namespace GiftHorse.SerializedGraphs
             set => m_DepthLevel = value;
         }
 
-        /// <summary>
-        /// <see cref="Rect"/> used by Unity Editor to manage node's position in the Graph View.
-        /// </summary>
+        /// <inheritdoc />
         public Rect Position
         {
             get => m_Position;
             set => m_Position = value;
         }
 
-        /// <summary>
-        /// Flag used by Unity Editor to toggle between Expanded/Collapse states in the Graph View.
-        /// </summary>
+        /// <inheritdoc />
         public bool Expanded
         {
             get => m_Expanded;
@@ -86,7 +84,9 @@ namespace GiftHorse.SerializedGraphs
             m_Id = Guid.NewGuid().ToString();
             m_Expanded = true;
 
-            ReflectionHelper.GetNodePorts(this, out m_InPorts, out m_OutPorts);
+            m_InPorts = ListPool<InPort>.Get();
+            m_OutPorts = ListPool<OutPort>.Get();
+            ReflectionHelper.GetNodePorts(this, m_InPorts, m_OutPorts);
         }
 
         /// <summary>
@@ -140,10 +140,16 @@ namespace GiftHorse.SerializedGraphs
         /// <summary>
         /// Releases the unmanaged resources used by the <see cref="ISerializedNode"/>.
         /// </summary>
-        public void Dispose() => OnDispose();
+        public void Dispose()
+        {
+            ListPool<InPort>.Release(m_InPorts);
+            ListPool<OutPort>.Release(m_OutPorts);
+            
+            OnDispose();
+        }
 
         /// <inheritdoc />
-        public bool TryFindInPortByName(string inputName, out InPort port)
+        public bool TryGetInPort(string inputName, out InPort port)
         {
             foreach (var inPort in m_InPorts)
             {
@@ -161,7 +167,7 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <inheritdoc />
-        public bool TryFindOutPortByName(string outputName, out OutPort port)
+        public bool TryGetOutPort(string outputName, out OutPort port)
         {
             foreach (var outPort in m_OutPorts)
             {
@@ -179,7 +185,7 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <inheritdoc />
-        public bool TryGetInPortByIndex(int index, out InPort port)
+        public bool TryGetInPort(int index, out InPort port)
         {
             if (index < m_InPorts.Count && m_InPorts.Count > -1)
             {
@@ -194,7 +200,7 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <inheritdoc />
-        public bool TryGetOutPortByIndex(int index, out OutPort port)
+        public bool TryGetOutPort(int index, out OutPort port)
         {
             if (index < m_OutPorts.Count && m_OutPorts.Count > -1)
             {
@@ -206,6 +212,33 @@ namespace GiftHorse.SerializedGraphs
             Debug.LogErrorFormat(k_OutOfBoundsOutPortIndex, Graph.name, m_Id, index);
 
             return false;
+        }
+
+        /// <inheritdoc />
+        public bool TryGetInputNodeOf(string portName, out ISerializedNode node)
+        {
+            if (TryGetInPort(portName, out var inPort)) 
+                return Graph.TryGetInputNode(inPort.ConnectionId, out node);
+            
+            node = null;
+            return false;
+        }
+
+        /// <inheritdoc />
+        public bool TryGetOutputNodesOf(string portName, List<ISerializedNode> nodes)
+        {
+            if (!TryGetOutPort(portName, out var outPort))
+                return false;
+            
+            foreach (var connectionId in outPort.ConnectionIds)
+            {
+                if (!Graph.TryGetOutputNode(connectionId, out ISerializedNode node))
+                    continue;
+                
+                nodes.Add(node);
+            }
+
+            return nodes.Any();
         }
     }
 }
