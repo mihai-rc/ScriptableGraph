@@ -16,7 +16,7 @@ namespace GiftHorse.SerializedGraphs
     {
         private const BindingFlags k_BindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         private const string k_NotSubTypeOfSerializedNode = "[SerializedGraph] Cannot process type: {0} because it is not a subtype of SerializedNode!";
-        
+
         /// <summary>
         /// Gets the title of the node based on its type.
         /// </summary>
