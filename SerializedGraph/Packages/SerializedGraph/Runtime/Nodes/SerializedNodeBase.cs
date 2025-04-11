@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace GiftHorse.SerializedGraphs
 {
@@ -27,6 +28,7 @@ namespace GiftHorse.SerializedGraphs
 
         private string m_Title;
         private bool m_Initialized;
+        private bool m_Disposed;
 
         /// <inheritdoc />
         public ISerializedGraph Graph { get; private set; }
@@ -83,8 +85,15 @@ namespace GiftHorse.SerializedGraphs
             m_Id = Guid.NewGuid().ToString();
             m_Expanded = true;
 
+            m_InPorts = ListPool<InPort>.Get();
+            m_OutPorts = ListPool<OutPort>.Get();
             ReflectionHelper.GetNodePorts(this, out m_InPorts, out m_OutPorts);
         }
+
+        /// <summary>
+        /// Finalizer to ensure unmanaged resources are released if Dispose is not called manually.
+        /// </summary>
+        ~SerializedNodeBase() => OnDispose();
 
         /// <summary>
         /// Node's initialization. It is called only once, when the graph is initialized.
@@ -102,10 +111,9 @@ namespace GiftHorse.SerializedGraphs
         protected virtual void OnDispose() { }
 
         /// <inheritdoc />
-        public void Init( ISerializedGraph graph)
+        public void Init(ISerializedGraph graph)
         {
-            if (m_Initialized)
-                return;
+            if (m_Initialized) return;
 
             Graph = graph;
             m_Initialized = true;
@@ -137,7 +145,15 @@ namespace GiftHorse.SerializedGraphs
         /// <summary>
         /// Releases the unmanaged resources used by the <see cref="ISerializedNode"/>.
         /// </summary>
-        public void Dispose() => OnDispose();
+        public void Dispose()
+        {
+            if (!m_Disposed) return;
+
+            OnDispose();
+            GC.SuppressFinalize(this);
+
+            m_Disposed = true;
+        }
 
         /// <inheritdoc />
         public bool TryGetInPort(string inputName, out InPort port)
