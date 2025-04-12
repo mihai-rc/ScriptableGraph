@@ -1,6 +1,6 @@
 {
   "name": "com.gift-horse.serialized-graph",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "displayName": "Serialized Graph",
   "description": "Graph data structure that maintains script nodes and serializes them into Unity Scenes.",
   "unity": "2022.3",

@@ -73,7 +73,7 @@ namespace GiftHorse.SerializedGraphs.Editor
                 return;
             }
 
-            m_Scene = graph.gameObject.scene;
+            m_Scene = graph.Scene;
             Load(graph);
         }
 

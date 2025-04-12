@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace GiftHorse.SerializedGraphs
 {
@@ -22,9 +24,10 @@ namespace GiftHorse.SerializedGraphs
         [SerializeReference] private List<ISerializedNode> m_Nodes;
         [SerializeReference] private List<Connection> m_Connections;
 
+        private readonly HashSet<string> m_VisitedNodes = new();
         private Dictionary<string, ISerializedNode> m_NodesById;
         private Dictionary<string, Connection> m_ConnectionsById;
-        private readonly HashSet<string> m_VisitedNodes = new();
+        private Scene m_Scene;
 
         /// <inheritdoc />
         public string Name { get; }
@@ -38,7 +41,19 @@ namespace GiftHorse.SerializedGraphs
         /// <inheritdoc />
         public IEnumerable<Connection> Connections => m_Connections;
 
-        private bool IsSceneLoaded => gameObject.scene.isLoaded;
+        /// <summary>
+        /// Reference to the <see cref="Scene"/> the <see cref="GameObject"/> this graph is attached to exists in.
+        /// </summary>
+        public Scene Scene
+        {
+            get
+            {
+                if (m_Scene == default)
+                    m_Scene = gameObject.scene;
+
+                return m_Scene;
+            }
+        }
 
         private Dictionary<string, ISerializedNode> NodesById
         {
@@ -66,6 +81,12 @@ namespace GiftHorse.SerializedGraphs
         {
             m_Nodes = new List<ISerializedNode>();
             m_Connections = new List<Connection>();
+        }
+
+        private void OnEnable()
+        {
+            if (m_Scene == default)
+                m_Scene = gameObject.scene;
         }
 
         private void Start()
@@ -131,9 +152,9 @@ namespace GiftHorse.SerializedGraphs
         /// <inheritdoc />
         public void AddNode(ISerializedNode node)
         {
-            if (!IsSceneLoaded)
+            if (!SceneManager.GetActiveScene().Equals(Scene))
             {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
                 return;
             }
 
@@ -144,9 +165,9 @@ namespace GiftHorse.SerializedGraphs
         /// <inheritdoc />
         public void RemoveNode(ISerializedNode node)
         {
-            if (!IsSceneLoaded)
+            if (!SceneManager.GetActiveScene().Equals(Scene))
             {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
                 return;
             }
 
@@ -157,9 +178,9 @@ namespace GiftHorse.SerializedGraphs
         /// <inheritdoc />
         public void ConnectNodes(ISerializedNode fromNode, int fromPortIndex, ISerializedNode toNode, int toPortIndex)
         {
-            if (!IsSceneLoaded)
+            if (!SceneManager.GetActiveScene().Equals(Scene))
             {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
                 return;
             }
 
@@ -179,9 +200,9 @@ namespace GiftHorse.SerializedGraphs
         /// <inheritdoc />
         public void DisconnectNodes(ISerializedNode fromNode, int fromPortIndex, ISerializedNode toNode, int toPortIndex)
         {
-            if (!IsSceneLoaded)
+            if (!SceneManager.GetActiveScene().Equals(Scene))
             {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
                 return;
             }
 
@@ -206,12 +227,12 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <inheritdoc />
-        public bool TryGetNodeById<T>(string nodeId, out T node) where T : class, ISerializedNode
+        public bool TryGetNodeById<T>(string nodeId, out T node)
         {
-            node = null;
-            if (!IsSceneLoaded)
+            node = default;
+            if (!SceneManager.GetActiveScene().Equals(Scene))
             {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
                 return false;
             }
 
@@ -232,12 +253,12 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <inheritdoc />
-        public bool TryGetInputNode<T>(string connectionId, out T node) where T : class, ISerializedNode
+        public bool TryGetInputNode<T>(string connectionId, out T node)
         {
-            node = null;
-            if (!IsSceneLoaded)
+            node = default;
+            if (!SceneManager.GetActiveScene().Equals(Scene))
             {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
                 return false;
             }
 
@@ -251,12 +272,12 @@ namespace GiftHorse.SerializedGraphs
         }
 
         /// <inheritdoc />
-        public bool TryGetOutputNode<T>(string connectionId, out T node) where T : class, ISerializedNode
+        public bool TryGetOutputNode<T>(string connectionId, out T node)
         {
-            node = null;
-            if (!IsSceneLoaded)
+            node = default;
+            if (!SceneManager.GetActiveScene().Equals(Scene))
             {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
                 return false;
             }
 
@@ -273,9 +294,9 @@ namespace GiftHorse.SerializedGraphs
         public bool TryGetConnectionById(string connectionId, out Connection connection)
         {
             connection = null;
-            if (!IsSceneLoaded)
+            if (!SceneManager.GetActiveScene().Equals(Scene))
             {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
+                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
                 return false;
             }
 

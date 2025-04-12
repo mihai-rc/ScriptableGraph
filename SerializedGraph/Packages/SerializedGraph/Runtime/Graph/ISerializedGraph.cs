@@ -79,7 +79,7 @@ namespace GiftHorse.SerializedGraphs
         /// <param name="node"> The reference to the corresponding node. Is null if the id was not found. </param>
         /// <typeparam name="T"> The subtype the node is expected to be received as. </typeparam>
         /// <returns> Returns true if the node was found, otherwise returns false. </returns>
-        bool TryGetNodeById<T>(string nodeId, out T node) where T : class, ISerializedNode;
+        bool TryGetNodeById<T>(string nodeId, out T node);
 
         /// <summary>
         /// Tries to get the origin <see cref="ISerializedNode"/> of a <see cref="Connection"/>.
@@ -88,7 +88,7 @@ namespace GiftHorse.SerializedGraphs
         /// <param name="node"> The reference to the origin node. Is null if the node was not found. </param>
         /// <typeparam name="T"> The subtype the node is expected to be received as. </typeparam>
         /// <returns> Returns true if the node was found, otherwise returns false. </returns>
-        bool TryGetInputNode<T>(string connectionId, out T node) where T : class, ISerializedNode;
+        bool TryGetInputNode<T>(string connectionId, out T node);
 
         /// <summary>
         /// Tries to get the destination <see cref="ISerializedNode"/> of a <see cref="Connection"/>.
@@ -97,7 +97,7 @@ namespace GiftHorse.SerializedGraphs
         /// <param name="node"> The reference to the destination node. Is null if the node was not found. </param>
         /// <typeparam name="T"> The subtype the node is expected to be received as. </typeparam>
         /// <returns> Returns true if the node was found, otherwise returns false. </returns>
-        bool TryGetOutputNode<T>(string connectionId, out T node) where T : class, ISerializedNode;
+        bool TryGetOutputNode<T>(string connectionId, out T node);
 
         /// <summary>
         /// Tries to get a <see cref="Connection"/> by its id.

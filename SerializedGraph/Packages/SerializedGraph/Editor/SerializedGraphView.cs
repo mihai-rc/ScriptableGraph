@@ -188,6 +188,7 @@ namespace GiftHorse.SerializedGraphs.Editor
                     CreateConnection(edge);
             }
 
+            m_Context.Window.Repaint();
             return graphViewChange;
         }
 
