@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace GiftHorse.SerializedGraphs
 {
@@ -85,8 +84,6 @@ namespace GiftHorse.SerializedGraphs
             m_Id = Guid.NewGuid().ToString();
             m_Expanded = true;
 
-            m_InPorts = ListPool<InPort>.Get();
-            m_OutPorts = ListPool<OutPort>.Get();
             ReflectionHelper.GetNodePorts(this, out m_InPorts, out m_OutPorts);
         }
 

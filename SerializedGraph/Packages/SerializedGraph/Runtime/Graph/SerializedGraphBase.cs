@@ -136,7 +136,7 @@ namespace GiftHorse.SerializedGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return;
             }
-            
+
             m_Nodes.Add(node);
             NodesById[node.Id] = node;
         }
@@ -149,7 +149,7 @@ namespace GiftHorse.SerializedGraphs
                 Debug.LogErrorFormat(k_SceneNotLoaded, name, gameObject.scene.name);
                 return;
             }
-            
+
             m_Nodes.Remove(node);
             NodesById.Remove(node.Id);
         }
