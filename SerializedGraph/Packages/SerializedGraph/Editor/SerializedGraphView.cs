@@ -44,12 +44,12 @@ namespace GiftHorse.SerializedGraphs.Editor
             UpdateExpandedNodes();
 
             graphViewChanged += OnGraphViewChanged;
-            Undo.undoRedoPerformed += OnUndoRedoPerformed;
+            Undo.undoRedoPerformed += RepaintGraph;
         }
 
         ~SerializedGraphView()
         {
-            Undo.undoRedoPerformed -= OnUndoRedoPerformed;
+            Undo.undoRedoPerformed -= RepaintGraph;
         }
 
         /// <inheritdoc />
@@ -188,11 +188,11 @@ namespace GiftHorse.SerializedGraphs.Editor
                     CreateConnection(edge);
             }
 
-            m_Context.Window.Repaint();
+            RepaintGraph();
             return graphViewChange;
         }
 
-        private void OnUndoRedoPerformed()
+        private void RepaintGraph()
         {
             foreach (var edge in m_EdgeViews)
                 RemoveElement(edge);
