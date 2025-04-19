@@ -178,6 +178,8 @@ namespace GiftHorse.SerializedGraphs.Editor
 
                 foreach (var removedNode in graphViewChange.elementsToRemove.OfType<SerializedNodeView>())
                     RemoveNodeFromGraph(removedNode);
+
+                RepaintGraph();
             }
 
             if (graphViewChange.edgesToCreate is not null)
@@ -188,7 +190,6 @@ namespace GiftHorse.SerializedGraphs.Editor
                     CreateConnection(edge);
             }
 
-            RepaintGraph();
             return graphViewChange;
         }
 

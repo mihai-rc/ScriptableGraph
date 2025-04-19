@@ -565,52 +565,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Nodes:
-  - rid: 6174426580635353103
   - rid: 6174426580635353105
   - rid: 6174426580635353110
   - rid: 6174426580635353115
   - rid: 6174426580635353118
+  - rid: 6174426734439694341
   m_Connections:
-  - rid: 6174426580635353109
   - rid: 6174426580635353114
   - rid: 6174426580635353117
   - rid: 6174426580635353121
+  - rid: 6174426734439694349
   references:
     version: 2
     RefIds:
-    - rid: 6174426580635353103
-      type: {class: PrintNode, ns: Calculator, asm: Assembly-CSharp}
-      data:
-        m_Id: 7b0af44e-9b5c-4cb9-9ab2-50e15a0cfaa6
-        m_Position:
-          serializedVersion: 2
-          x: 732
-          y: 348
-          width: 212
-          height: 106
-        m_DepthLevel: 3
-        m_Expanded: 1
-        m_InPorts:
-        - rid: 6174426580635353104
-        m_OutPorts: []
-        Value: 0
-        Logger: {fileID: 279511793}
-    - rid: 6174426580635353104
-      type: {class: InPort, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
-      data:
-        m_Name: Value
-        m_NodeId: 7b0af44e-9b5c-4cb9-9ab2-50e15a0cfaa6
-        m_Index: 0
-        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
-        m_ConnectionId: c0397f12-69fe-485a-b1ab-1d19510e00b1
     - rid: 6174426580635353105
       type: {class: SumNode, ns: Calculator, asm: Assembly-CSharp}
       data:
         m_Id: 2767de4e-d74c-43d4-bf22-c056266dbb68
         m_Position:
           serializedVersion: 2
-          x: 486
+          x: 493
           y: 333
           width: 212
           height: 130
@@ -652,15 +626,7 @@ MonoBehaviour:
         m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
         m_ConnectionIds:
-        - c0397f12-69fe-485a-b1ab-1d19510e00b1
-    - rid: 6174426580635353109
-      type: {class: Connection, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
-      data:
-        m_Id: c0397f12-69fe-485a-b1ab-1d19510e00b1
-        m_FromPort:
-          rid: 6174426580635353108
-        m_ToPort:
-          rid: 6174426580635353104
+        - 5cb9617b-2932-49e9-88fd-0e8279841245
     - rid: 6174426580635353110
       type: {class: SumNode, ns: Calculator, asm: Assembly-CSharp}
       data:
@@ -725,7 +691,7 @@ MonoBehaviour:
         m_Position:
           serializedVersion: 2
           x: 248
-          y: 436
+          y: 422
           width: 212
           height: 125
         m_DepthLevel: 0
@@ -760,7 +726,7 @@ MonoBehaviour:
         m_Id: 09323da1-459e-4255-85fd-49f0e6e8d9c2
         m_Position:
           serializedVersion: 2
-          x: -4
+          x: 0
           y: 268
           width: 212
           height: 125
@@ -790,6 +756,40 @@ MonoBehaviour:
           rid: 6174426580635353119
         m_ToPort:
           rid: 6174426580635353112
+    - rid: 6174426734439694341
+      type: {class: PrintNode, ns: Calculator, asm: Assembly-CSharp}
+      data:
+        m_Id: 5def4be9-1ffe-4737-a646-4a1c4ffae174
+        m_Position:
+          serializedVersion: 2
+          x: 722
+          y: 333
+          width: 212
+          height: 106
+        m_DepthLevel: 3
+        m_Expanded: 1
+        m_InPorts:
+        - rid: 6174426734439694342
+        m_OutPorts: []
+        Value: 0
+        Logger: {fileID: 0}
+    - rid: 6174426734439694342
+      type: {class: InPort, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Name: Value
+        m_NodeId: 5def4be9-1ffe-4737-a646-4a1c4ffae174
+        m_Index: 0
+        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        m_ConnectionId: 5cb9617b-2932-49e9-88fd-0e8279841245
+    - rid: 6174426734439694349
+      type: {class: Connection, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Id: 5cb9617b-2932-49e9-88fd-0e8279841245
+        m_FromPort:
+          rid: 6174426580635353108
+        m_ToPort:
+          rid: 6174426734439694342
 --- !u!1 &1510563374
 GameObject:
   m_ObjectHideFlags: 0
