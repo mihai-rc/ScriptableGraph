@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1167204504504658886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a55ba0218b7f4a65ac2c0a1f85b50124, type: 3}
+  m_Name: Print
+  m_EditorClassIdentifier: 
+  m_Id: 7cc4ba53-1268-447b-8862-62beeef9da21
+  m_Position:
+    serializedVersion: 2
+    x: 624
+    y: 463
+    width: 0
+    height: 0
+  m_DepthLevel: 0
+  m_Expanded: 1
+  m_InPorts:
+  - rid: 6174426780411363332
+  m_OutPorts: []
+  Value: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 6174426780411363332
+      type: {class: InPort, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Name: Value
+        m_NodeId: 7cc4ba53-1268-447b-8862-62beeef9da21
+        m_Index: 0
+        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        m_ConnectionId: 
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc88283d05e1d63419228830fde845c1, type: 3}
+  m_Name: CalculatorGraph
+  m_EditorClassIdentifier: 
+  m_Nodes:
+  - {fileID: -1167204504504658886}
+  m_Connections: []
+  references:
+    version: 2
+    RefIds: []

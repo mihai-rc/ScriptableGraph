@@ -1,13 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace GiftHorse.SerializedGraphs.Editor
 {
     public class SerializedGraphEditorContext
     {
         /// <summary>
-        /// Reference to the graph component.
+        /// Reference to the graph asset.
         /// </summary>
         public SerializedGraphBase Graph { get; private set; }
 
@@ -36,7 +40,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// <summary>
         /// <see cref="SerializedGraphEditorContext"/>'s constructor.
         /// </summary>
-        /// <param name="graph"> Reference to the graph component. </param>
+        /// <param name="graph"> Reference to the graph asset. </param>
         /// <param name="window"> The editor window that contains the <see cref="SerializedGraphView"/>. </param>
         public SerializedGraphEditorContext(SerializedGraphBase graph, SerializedGraphWindow window)
         {
@@ -73,13 +77,25 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// </summary>
         public void MarkAssetAsDirty()
         {
-            if (Graph == null)
+            if (Graph != null)
             {
-                if (Window.TryGetSerializedGraph(out var graph))
-                    Graph = graph;
+                // if (Window.TryGetSerializedGraph(out var graph))
+                //     Graph = graph;
+                
+                // return;
+                EditorUtility.SetDirty(Graph);
+                // AssetDatabase.SaveAssetIfDirty(Graph);
             }
 
-            EditorUtility.SetDirty(Graph);
+            // foreach (var item in AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GetAssetPath(Graph)))
+            // {
+            //     var node = item as SerializedNodeBase;
+            //     if (node != null)
+            //     {
+            //         if (!Graph.Nodes.Contains(node))
+            //             AssetDatabase.RemoveObjectFromAsset(node);
+            //     }
+            // }
         }
     }
 }

@@ -16,7 +16,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// <summary>
         /// Opens a <see cref="SerializedGraphWindow"/> for the given <see cref="SerializedGraphBase"/>.
         /// </summary>
-        /// <param name="sceneAsset"> Reference to the graph component the window will edit. </param>
+        /// <param name="sceneAsset"> Reference to the graph asset the window will edit. </param>
         public static void Open(SerializedGraphBase sceneAsset)
         {
             var windows = Resources.FindObjectsOfTypeAll<SerializedGraphWindow>();
@@ -37,47 +37,45 @@ namespace GiftHorse.SerializedGraphs.Editor
             newWindow.Load(sceneAsset);
         }
 
-        [SerializeField] private string m_GraphHierarchyPath;
+        [SerializeField] private SerializedGraphBase m_GraphAsset;
         private SerializedGraphEditorContext m_Context;
-        private Scene m_Scene;
 
         /// <summary>
         /// Tries to find the <see cref="SerializedGraphBase"/> component in the active scene from the cached path.
         /// </summary>
         /// <param name="graph"> The reference to the <see cref="SerializedGraphBase"/> if found, otherwise is null. </param>
         /// <returns> Returns whether the <see cref="SerializedGraphBase"/> was found or not. </returns>
-        public bool TryGetSerializedGraph(out SerializedGraphBase graph)
-        {
-            graph = null;
-            if (string.IsNullOrEmpty(m_GraphHierarchyPath)) 
-                return false;
+        // public bool TryGetSerializedGraph(out SerializedGraphBase graph)
+        // {
+        //     graph = null;
+        //     if (string.IsNullOrEmpty(m_GraphAsset)) 
+        //         return false;
+        //
+        //     // This way we can keep the window open between editor sessions but this method
+        //     // only works if the owner GameObject has only one SerializedGraphBase component attached.
+        //
+        //     graph = GameObject
+        //         .Find(m_GraphAsset)
+        //         .GetComponent<SerializedGraphBase>();
+        //
+        //     return true;
+        // }
 
-            // This way we can keep the window open between editor sessions but this method
-            // only works if the owner GameObject has only one SerializedGraphBase component attached.
+        // private void OnEnable()
+        // {
+        //     if (!TryGetSerializedGraph(out var graph)) 
+        //         return;
+        //
+        //     if (graph is null)
+        //     {
+        //         CloseWindow();
+        //         return;
+        //     }
+        //
+        //     Load(graph);
+        // }
 
-            graph = GameObject
-                .Find(m_GraphHierarchyPath)
-                .GetComponent<SerializedGraphBase>();
-
-            return true;
-        }
-
-        private void OnEnable()
-        {
-            if (!TryGetSerializedGraph(out var graph)) 
-                return;
-
-            if (graph is null)
-            {
-                CloseWindow();
-                return;
-            }
-
-            m_Scene = graph.Scene;
-            Load(graph);
-        }
-
-        private void OnDestroy() => EditorSceneManager.activeSceneChangedInEditMode -= OnSceneChanged; 
+        // private void OnDestroy() => EditorSceneManager.activeSceneChangedInEditMode -= OnSceneChanged; 
 
         private void OnGUI()
         {
@@ -89,49 +87,36 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private void Load(SerializedGraphBase graph)
         {
-            m_GraphHierarchyPath = GetHierarchyPath(graph);
-            EditorSceneManager.activeSceneChangedInEditMode += OnSceneChanged;
-
-            CreateGraph(graph);
-        }
-
-        private void CreateGraph(SerializedGraphBase graph)
-        {
+            m_GraphAsset = graph;
             m_Context = new SerializedGraphEditorContext(graph, this);
             m_Context.DrawGraphView();
         }
 
-        private void CloseWindow()
-        {
-            m_GraphHierarchyPath = string.Empty;
-            Close();
-        }
+        // private void OnSceneChanged(Scene from, Scene to)
+        // {
+        //     if (m_Scene == to)
+        //         return;
+        //
+        //     CloseWindow();
+        // }
 
-        private void OnSceneChanged(Scene from, Scene to)
-        {
-            if (m_Scene == to)
-                return;
-
-            CloseWindow();
-        }
-
-        private string GetHierarchyPath(Component component)
-        {
-            if (component is null)
-            {
-                Debug.LogWarningFormat(k_ComponentNotFound, m_GraphHierarchyPath);
-                return string.Empty;
-            }
-
-            var current = component.transform;
-            var path = component.gameObject.name;
-            while (current.parent is not null)
-            {
-                current = current.parent;
-                path = $"{current.name}/{path}";
-            }
-
-            return path;
-        }
+        // private string GetHierarchyPath(Component component)
+        // {
+        //     if (component is null)
+        //     {
+        //         Debug.LogWarningFormat(k_ComponentNotFound, m_GraphAsset);
+        //         return string.Empty;
+        //     }
+        //
+        //     var current = component.transform;
+        //     var path = component.gameObject.name;
+        //     while (current.parent is not null)
+        //     {
+        //         current = current.parent;
+        //         path = $"{current.name}/{path}";
+        //     }
+        //
+        //     return path;
+        // }
     }
 }

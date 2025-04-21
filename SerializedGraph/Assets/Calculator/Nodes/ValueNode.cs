@@ -7,13 +7,13 @@ namespace Calculator
     {
         [Output] public float Value;
 
-        [NodeField] public Logger Logger;
+        // [NodeField] public LoggerProperty LoggerProperty;
         [NodeField] public float Input;
 
         protected override void OnProcess()
         {
             Value = Input;
-            Logger.AddLog($"Node: {Id}, has Depth Level: {DepthLevel} and Outputs value: {Value}");
+            // LoggerProperty.Logger.AddLog($"Node: {Id}, has Depth Level: {DepthLevel} and Outputs value: {Value}");
         }
     }
 }

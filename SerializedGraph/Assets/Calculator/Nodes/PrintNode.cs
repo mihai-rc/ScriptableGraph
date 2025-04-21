@@ -6,12 +6,12 @@ namespace Calculator
     public class PrintNode : CalculatorNode
     {
         [Input] public float Value;
-        [NodeField] public Logger Logger;
+        // [NodeField] public LoggerProperty LoggerProperty;
 
         protected override void OnProcess()
         {
-            Logger.AddLog($"Node: {Id}, has Depth Level: {DepthLevel}. PRINT: {Value}");
-            Logger.ShowLog();
+            // LoggerProperty.Logger.AddLog($"Node: {Id}, has Depth Level: {DepthLevel}. PRINT: {Value}");
+            // LoggerProperty.Logger.ShowLog();
         }
     }
 }

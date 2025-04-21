@@ -39,6 +39,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             SetupManipulators();
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
 
+            // DrawBlackboard();
             DrawNodes();
             DrawConnections();
             UpdateExpandedNodes();
@@ -119,6 +120,37 @@ namespace GiftHorse.SerializedGraphs.Editor
             this.AddManipulator(new RectangleSelector());
             this.AddManipulator(new ClickSelector());
         }
+
+        // private void DrawBlackboard()
+        // {
+        //     var blackboard = new Blackboard(this)
+        //     {
+        //         title = "Blackboard",
+        //         scrollable = true,
+        //         addItemRequested = blackboard =>
+        //         {
+        //             var newBlackboardField = new BlackboardField
+        //             {
+        //                 text = "New Variable",
+        //                 typeText = "Type",
+        //                 // type = typeof(string)
+        //             };
+        //
+        //             // var container = new VisualElement();
+        //             // container.Add(newBlackboardField);
+        //             blackboard.Add(newBlackboardField);
+        //         }
+        //     };
+        //
+        //     blackboard.Add(new BlackboardSection 
+        //     {
+        //         title = "Properties",
+        //         // type = typeof(string)
+        //     });
+        //
+        //     blackboard.SetPosition(new Rect(10, 10, 200, 200));
+        //     Add(blackboard);
+        // }
 
         private void DrawNodes()
         {
@@ -225,6 +257,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         {
             m_Context.Graph.RemoveNode(nodeView.SerializedNode);
             m_Context.SerializedObject.Update();
+            Undo.DestroyObjectImmediate(nodeView.SerializedNode as SerializedNodeBase);
 
             m_NodeViewsByNodeId.Remove(nodeView.SerializedNode.Id);
             m_NodeViews.Remove(nodeView);

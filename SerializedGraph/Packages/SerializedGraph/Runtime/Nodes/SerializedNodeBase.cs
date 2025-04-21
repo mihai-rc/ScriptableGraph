@@ -9,7 +9,7 @@ namespace GiftHorse.SerializedGraphs
     /// Serialized Nodes base class.
     /// </summary>
     [Serializable]
-    public class SerializedNodeBase : ISerializedNode
+    public class SerializedNodeBase : ScriptableObject, ISerializedNode
     {
         private const string k_NodeNotInitialized = "[SerializedGraph] Trying to process a node that was not initialized! Graph name: {0}, Node id: {1}";
         private const string k_OutOfBoundsInPortIndex = "[SerializedGraph] Trying to get an In port by an out of bounds index! Graph name: {0}, Node id: {1}, In Port index: {2}";
@@ -25,7 +25,7 @@ namespace GiftHorse.SerializedGraphs
         [SerializeReference] private List<InPort> m_InPorts;
         [SerializeReference] private List<OutPort> m_OutPorts;
 
-        private string m_Title;
+        // private string m_Title;
         private bool m_Initialized;
         private bool m_Disposed;
 
@@ -36,16 +36,10 @@ namespace GiftHorse.SerializedGraphs
         public string Id => m_Id;
 
         /// <inheritdoc />
-        public string Title
+        public string Name
         {
-            get
-            {
-                if (!string.IsNullOrEmpty(m_Title))
-                    return m_Title;
-
-                m_Title = ReflectionHelper.GetNodeTitleByType(GetType());
-                return m_Title;
-            }
+            get => name;
+            set => name = value;
         }
 
         /// <inheritdoc />

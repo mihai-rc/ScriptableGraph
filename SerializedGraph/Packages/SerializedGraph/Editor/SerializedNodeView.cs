@@ -99,10 +99,13 @@ namespace GiftHorse.SerializedGraphs.Editor
             {
                 var element = nodes.GetArrayElementAtIndex(i);
                 var elementId = element.FindPropertyRelative(k_IdProperty);
-                    
+
+                if (elementId is null)
+                    continue;
+
                 if (!elementId.stringValue.Equals(m_SerializedNode.Id)) 
                     continue;
-                    
+
                 return element;
             }
 
@@ -112,8 +115,8 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private void SetupNodeHeaderByReflection(Type type)
         {
-            name = m_SerializedNode.Title;
-            title = m_SerializedNode.Title;
+            name = m_SerializedNode.Name;
+            title = m_SerializedNode.Name;
 
             if (!ReflectionHelper.TryGetNodeHeaderColor(type, out var color)) 
                 return;
@@ -175,9 +178,10 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private void DrawProperty(string propertyName)
         {
-            m_SerializedProperty ??= InitializeSerializedProperty();
+            // m_SerializedProperty ??= InitializeSerializedProperty();
 
-            var property = m_SerializedProperty.FindPropertyRelative(propertyName);
+            var nodeSerializedObject = new SerializedObject(m_SerializedNode as SerializedNodeBase);
+            var property = nodeSerializedObject.FindProperty(propertyName);
             if (property is null)
             {
                 Debug.LogErrorFormat(k_InvalidNodeProperty, propertyName);
@@ -186,7 +190,8 @@ namespace GiftHorse.SerializedGraphs.Editor
 
             var propertyField = new PropertyField(property);
             propertyField.name = k_PropertyFieldName;
-            propertyField.bindingPath = property.propertyPath;
+            // propertyField.bindingPath = property.propertyPath;
+            propertyField.Bind(nodeSerializedObject);
 
             m_PropertiesHolder.Add(propertyField);
         }

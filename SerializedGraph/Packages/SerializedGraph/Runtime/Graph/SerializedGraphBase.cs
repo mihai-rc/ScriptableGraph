@@ -1,18 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace GiftHorse.SerializedGraphs
 {
     /// <summary>
-    /// Serialized Graph components base class.
+    /// Serialized Graph asset base class.
     /// </summary>
-    [DisallowMultipleComponent]
-    public abstract class SerializedGraphBase : MonoBehaviour, ISerializedGraph
+    public abstract class SerializedGraphBase : ScriptableObject, ISerializedGraph
     {
-        private const string k_SceneNotLoaded = "[SerializedGraph] The graph: {0} cannot be interacted with when its parent scene: {1} is not loaded!";
         private const string k_PortsAlreadyConnected = "[SerializedGraph] Trying to connect two ports that are already connected! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
         private const string k_PortsNotConnected = "[SerializedGraph] Trying to disconnect two ports that are not connected! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
         private const string k_PortsTypeMismatch = "[SerializedGraph] Trying to connect two ports that are not of the same type! Graph name: {0}, From Node Id: {1} To Node Id: {2}";
@@ -21,13 +17,12 @@ namespace GiftHorse.SerializedGraphs
         private const string k_ConnectionNotFound = "[SerializedGraph] No connection was found for Id: {0}! Graph name: {1}.";
         private const string k_NodeCastFailed = "[SerializedGraph] Cast failed! The node with Id: {0} is not of type: {1}! Graph name: {2}.";
 
-        [SerializeReference] private List<ISerializedNode> m_Nodes;
-        [SerializeReference] private List<Connection> m_Connections;
+        [SerializeField] private List<SerializedNodeBase> m_Nodes;
+        [SerializeField] private List<Connection> m_Connections;
 
         private readonly HashSet<string> m_VisitedNodes = new();
         private Dictionary<string, ISerializedNode> m_NodesById;
         private Dictionary<string, Connection> m_ConnectionsById;
-        private Scene m_Scene;
 
         /// <inheritdoc />
         public string Name { get; }
@@ -36,31 +31,17 @@ namespace GiftHorse.SerializedGraphs
         public abstract string NodesBaseType { get; }
 
         /// <inheritdoc />
-        public IEnumerable<ISerializedNode> Nodes => m_Nodes;
+        public IEnumerable<ISerializedNode> Nodes => m_Nodes.OfType<ISerializedNode>();
 
         /// <inheritdoc />
         public IEnumerable<Connection> Connections => m_Connections;
-
-        /// <summary>
-        /// Reference to the <see cref="Scene"/> the <see cref="GameObject"/> this graph is attached to exists in.
-        /// </summary>
-        public Scene Scene
-        {
-            get
-            {
-                if (m_Scene == default)
-                    m_Scene = gameObject.scene;
-
-                return m_Scene;
-            }
-        }
 
         private Dictionary<string, ISerializedNode> NodesById
         {
             get
             {
                 if (m_NodesById is null)
-                    m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n);
+                    m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n as ISerializedNode);
 
                 return m_NodesById;
             }
@@ -79,32 +60,8 @@ namespace GiftHorse.SerializedGraphs
 
         protected SerializedGraphBase()
         {
-            m_Nodes = new List<ISerializedNode>();
+            m_Nodes = new List<SerializedNodeBase>();
             m_Connections = new List<Connection>();
-        }
-
-        private void OnEnable()
-        {
-            if (m_Scene == default)
-                m_Scene = gameObject.scene;
-        }
-
-        private void Start()
-        {
-            foreach (var node in Nodes)
-                node.Init(this);
-
-            foreach (var connection in m_Connections)
-                connection.Init(NodesById);
-
-            SortNodes();
-            OnStart();
-        }
-
-        private void OnDestroy()
-        {
-            foreach (var node in Nodes)
-                node.Dispose();
         }
 
         /// <summary>
@@ -131,6 +88,19 @@ namespace GiftHorse.SerializedGraphs
         protected virtual void OnStart() { }
 
         /// <inheritdoc />
+        public void Init() 
+        {
+            foreach (var node in Nodes)
+                node.Init(this);
+
+            foreach (var connection in m_Connections)
+                connection.Init(NodesById);
+
+            SortNodes();
+            OnStart();
+        }
+
+        /// <inheritdoc />
         public void SortNodes()
         {
             m_Nodes.Sort((left, right) =>
@@ -152,38 +122,22 @@ namespace GiftHorse.SerializedGraphs
         /// <inheritdoc />
         public void AddNode(ISerializedNode node)
         {
-            if (!SceneManager.GetActiveScene().Equals(Scene))
-            {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
-                return;
-            }
+            var baseNode = node as SerializedNodeBase;
 
-            m_Nodes.Add(node);
+            m_Nodes.Add(baseNode);
             NodesById[node.Id] = node;
         }
 
         /// <inheritdoc />
         public void RemoveNode(ISerializedNode node)
         {
-            if (!SceneManager.GetActiveScene().Equals(Scene))
-            {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
-                return;
-            }
-
-            m_Nodes.Remove(node);
+            m_Nodes.Remove(node as SerializedNodeBase);
             NodesById.Remove(node.Id);
         }
 
         /// <inheritdoc />
         public void ConnectNodes(ISerializedNode fromNode, int fromPortIndex, ISerializedNode toNode, int toPortIndex)
         {
-            if (!SceneManager.GetActiveScene().Equals(Scene))
-            {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
-                return;
-            }
-
             if (!fromNode.TryGetOutPort(fromPortIndex, out var fromPort)) 
                 return;
 
@@ -200,12 +154,6 @@ namespace GiftHorse.SerializedGraphs
         /// <inheritdoc />
         public void DisconnectNodes(ISerializedNode fromNode, int fromPortIndex, ISerializedNode toNode, int toPortIndex)
         {
-            if (!SceneManager.GetActiveScene().Equals(Scene))
-            {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
-                return;
-            }
-
             if (!fromNode.TryGetOutPort(fromPortIndex, out var fromPort)) 
                 return;
 
@@ -222,7 +170,7 @@ namespace GiftHorse.SerializedGraphs
         /// <inheritdoc />
         public void UpdateMappings()
         {
-            m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n);
+            m_NodesById = m_Nodes.ToDictionary(n => n.Id, n => n as ISerializedNode);
             m_ConnectionsById = m_Connections.ToDictionary(c => c.Id, c => c);
         }
 
@@ -230,12 +178,6 @@ namespace GiftHorse.SerializedGraphs
         public bool TryGetNodeById<T>(string nodeId, out T node)
         {
             node = default;
-            if (!SceneManager.GetActiveScene().Equals(Scene))
-            {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
-                return false;
-            }
-
             if (NodesById.TryGetValue(nodeId, out var serializedNode))
             {
                 if (serializedNode is not T castedNode)
@@ -256,12 +198,6 @@ namespace GiftHorse.SerializedGraphs
         public bool TryGetInputNode<T>(string connectionId, out T node)
         {
             node = default;
-            if (!SceneManager.GetActiveScene().Equals(Scene))
-            {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
-                return false;
-            }
-
             if (!TryGetConnectionById(connectionId, out var connection))
                 return false;
 
@@ -275,12 +211,6 @@ namespace GiftHorse.SerializedGraphs
         public bool TryGetOutputNode<T>(string connectionId, out T node)
         {
             node = default;
-            if (!SceneManager.GetActiveScene().Equals(Scene))
-            {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
-                return false;
-            }
-
             if (!TryGetConnectionById(connectionId, out var connection))
                 return false;
 
@@ -294,17 +224,21 @@ namespace GiftHorse.SerializedGraphs
         public bool TryGetConnectionById(string connectionId, out Connection connection)
         {
             connection = null;
-            if (!SceneManager.GetActiveScene().Equals(Scene))
-            {
-                Debug.LogErrorFormat(k_SceneNotLoaded, name, Scene.name);
-                return false;
-            }
 
             if (ConnectionsById.TryGetValue(connectionId, out connection))
                 return true;
 
             Debug.LogErrorFormat(k_ConnectionNotFound, connectionId, name);
             return false;
+        }
+
+        /// <summary>
+        /// Disposes the graph and all its nodes.
+        /// </summary>
+        public void Dispose()
+        {
+            foreach (var node in Nodes)
+                node.Dispose();
         }
 
         private bool TryConnectPorts(OutPort from, InPort to, out Connection connection)

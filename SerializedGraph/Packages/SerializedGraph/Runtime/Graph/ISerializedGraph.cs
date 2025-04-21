@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace GiftHorse.SerializedGraphs
@@ -5,7 +6,7 @@ namespace GiftHorse.SerializedGraphs
     /// <summary>
     /// Serialized Graph interface.
     /// </summary>
-    public interface ISerializedGraph
+    public interface ISerializedGraph : IDisposable
     {
         /// <summary>
         /// The name of the graph.
@@ -26,6 +27,11 @@ namespace GiftHorse.SerializedGraphs
         /// Collection of all <see cref="Connection"/>s.
         /// </summary>
         IEnumerable<Connection> Connections { get; }
+
+        /// <summary>
+        /// Initializes the graph and all <see cref="ISerializedNode"/>s in it.
+        /// </summary>
+        void Init();
 
         /// <summary>
         /// Sorts the <see cref="ISerializedNode"/>s in the graph by their depth level.

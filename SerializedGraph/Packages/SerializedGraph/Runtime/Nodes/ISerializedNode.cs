@@ -7,7 +7,7 @@ namespace GiftHorse.SerializedGraphs
     /// <summary>
     /// Serialized Node interface.
     /// </summary>
-    public interface ISerializedNode : IDisposable
+    public interface  ISerializedNode : IDisposable
     {
         /// <summary>
         /// Reference to the <see cref="ISerializedGraph"/> that owns this <see cref="ISerializedNode"/>.
@@ -20,9 +20,9 @@ namespace GiftHorse.SerializedGraphs
         string Id { get; }
 
         /// <summary>
-        /// The title of the node. It is displayed on node view header.
+        /// The name of the node.
         /// </summary>
-        string Title { get; }
+        string Name { get; set; }
 
         /// <summary>
         /// Number of nodes in the longest input chain this node is part of. It is used by

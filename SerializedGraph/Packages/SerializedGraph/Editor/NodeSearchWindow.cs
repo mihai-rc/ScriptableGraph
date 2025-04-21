@@ -62,15 +62,13 @@ namespace GiftHorse.SerializedGraphs.Editor
             var windowMousePosition = m_Window.rootVisualElement.ChangeCoordinatesTo(m_GraphView, context.screenMousePosition - m_Window.position.position);
             var graphMousePosition = m_GraphView.contentViewContainer.WorldToLocal(windowMousePosition);
 
-            if (searchTreeEntry.userData is not Type type) 
+            if (searchTreeEntry.userData is not Type type)
                 return false;
 
-            if (Activator.CreateInstance(type) is not ISerializedNode node) 
-                return false;
+            if (!TryCreateNode(m_Graph as SerializedGraphBase, type, graphMousePosition, out var node))
+                return true;
 
-            node.Position = new Rect(graphMousePosition, new Vector2());
             m_GraphView.Add(node);
-
             return true;
         }
 
@@ -148,6 +146,31 @@ namespace GiftHorse.SerializedGraphs.Editor
 
             HashSetPool<string>.Release(groupSet);
             return tree;
+        }
+        
+        public bool TryCreateNode(SerializedGraphBase graph, Type nodeType, Vector2 graphMousePosition, out SerializedNodeBase node)
+        {
+            node = null;
+            if (graph == null)
+            {
+                Debug.LogError("Cannot add a node to a null graph.");
+                return false;
+            }
+
+            if (!nodeType.IsSubclassOf(typeof(SerializedNodeBase)))
+            {
+                Debug.LogError($"Cannot create a node of type {nodeType.Name} because it does not inherit from SerializedNodeBase.");
+                return false;
+            }
+
+            node = ScriptableObject.CreateInstance(nodeType) as SerializedNodeBase;
+            node.Name = ReflectionHelper.GetNodeTitleByType(node.GetType());
+            node.Position = new Rect(graphMousePosition, new Vector2());
+
+            AssetDatabase.AddObjectToAsset(node, graph);
+            Undo.RegisterCreatedObjectUndo(node, "Create My Scriptable");
+
+            return true;
         }
     }
 }
