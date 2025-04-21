@@ -6,10 +6,10 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 using UnityEngine;
 
-namespace GiftHorse.SerializedGraphs.Editor
+namespace GiftHorse.ScriptableGraphs.Editor
 {
     /// <summary>
-    /// <see cref="Node"/> class used to display a <see cref="ISerializedNode"/> in the graph editor.
+    /// <see cref="Node"/> class used to display a <see cref="ScriptableNode"/> in the graph editor.
     /// </summary>
     public class SerializedNodeView : Node
     {
@@ -17,18 +17,17 @@ namespace GiftHorse.SerializedGraphs.Editor
         private const string k_PropertyFieldName = "PropertyField";
         private const string k_IdProperty = "m_Id";
         private const string k_NodesProperty = "m_Nodes";
-        private const string k_SerializedPropertyNotFoundError = "[Editor] [SerializedGraph] Could not find the SerializedProperty of ISerializedNode: {0}, Id: {1}.";
-        private const string k_InvalidNodeProperty = "[Editor] [SerializedGraph] Could not find the relative property by name: {0}. Make sure you use [NodeField] attribute only with serialized types.";
-
-        private readonly ISerializedNode m_SerializedNode;
+        private const string k_SerializedPropertyNotFoundError = "[Editor] [ScriptableGraph] Could not find the SerializedProperty of ISerializedNode: {0}, Id: {1}.";
+        private const string k_InvalidNodeProperty = "[Editor] [ScriptableGraph] Could not find the relative property by name: {0}. Make sure you use [NodeField] attribute only with serialized types.";
+        
         private readonly SerializedGraphEditorContext m_Context;
         private SerializedProperty m_SerializedProperty;
         private VisualElement m_PropertiesHolder;
 
         /// <summary>
-        /// Reference to the <see cref="ISerializedNode"/> this view is handling.
+        /// Reference to the <see cref="ScriptableNode"/> this view is handling.
         /// </summary>
-        public ISerializedNode SerializedNode => m_SerializedNode;
+        public ScriptableNode ScriptableNode { get; }
 
         /// <summary>
         /// List of all <see cref="InPort"/> views of this node.
@@ -43,11 +42,11 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// <summary>
         /// <see cref="SerializedNodeView"/>'s constructor.
         /// </summary>
-        /// <param name="node"> Reference to the <see cref="ISerializedNode"/> this view is handling. </param>
+        /// <param name="node"> Reference to the <see cref="ScriptableNode"/> this view is handling. </param>
         /// <param name="context"> Reference to the <see cref="SearchWindowContext"/> to access relevant dependencies. </param>
-        public SerializedNodeView(ISerializedNode node, SerializedGraphEditorContext context)
+        public SerializedNodeView(ScriptableNode node, SerializedGraphEditorContext context)
         {
-            m_SerializedNode = node;
+            ScriptableNode = node;
             m_Context = context;
             
             // Remove the delete capability
@@ -64,14 +63,14 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// </summary>
         public void SavePosition()
         {
-            m_SerializedNode.Position = GetPosition();
+            ScriptableNode.Position = GetPosition();
         }
 
         protected override void ToggleCollapse()
         {
             base.ToggleCollapse();
 
-            m_SerializedNode.Expanded = expanded;
+            ScriptableNode.Expanded = expanded;
             m_Context.MarkAssetAsDirty();
         }
 
@@ -90,7 +89,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             var nodes = m_Context.SerializedObject.FindProperty(k_NodesProperty);
             if (!nodes.isArray)
             {
-                Debug.LogErrorFormat(k_SerializedPropertyNotFoundError, name, m_SerializedNode.Id);
+                Debug.LogErrorFormat(k_SerializedPropertyNotFoundError, name, ScriptableNode.Id);
                 return null;
             }
 
@@ -103,20 +102,20 @@ namespace GiftHorse.SerializedGraphs.Editor
                 if (elementId is null)
                     continue;
 
-                if (!elementId.stringValue.Equals(m_SerializedNode.Id)) 
+                if (!elementId.stringValue.Equals(ScriptableNode.Id)) 
                     continue;
 
                 return element;
             }
 
-            Debug.LogErrorFormat(k_SerializedPropertyNotFoundError, name, m_SerializedNode.Id);
+            Debug.LogErrorFormat(k_SerializedPropertyNotFoundError, name, ScriptableNode.Id);
             return null;
         }
 
         private void SetupNodeHeaderByReflection(Type type)
         {
-            name = m_SerializedNode.Name;
-            title = m_SerializedNode.Name;
+            name = ScriptableNode.name;
+            title = ScriptableNode.name;
 
             if (!ReflectionHelper.TryGetNodeHeaderColor(type, out var color)) 
                 return;
@@ -127,20 +126,20 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private void InitializeNodeByReflection()
         {
-            var type = m_SerializedNode.GetType();
+            var type = ScriptableNode.GetType();
             SetupNodeHeaderByReflection(type);
             GetNodePropertiesByReflection(type);
         }
 
         private void CreateInputs()
         {
-            foreach (var inPort in m_SerializedNode.InPorts)
+            foreach (var inPort in ScriptableNode.InPorts)
                 CreateInputPort(inPort.Name, Type.GetType(inPort.CompatibleType), false);
         }
 
         private void CreateOutputs()
         {
-            foreach (var outPort in m_SerializedNode.OutPorts)
+            foreach (var outPort in ScriptableNode.OutPorts)
                 CreateOutputPort(outPort.Name, Type.GetType(outPort.CompatibleType), true);
         }
 
@@ -180,7 +179,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         {
             // m_SerializedProperty ??= InitializeSerializedProperty();
 
-            var nodeSerializedObject = new SerializedObject(m_SerializedNode as SerializedNodeBase);
+            var nodeSerializedObject = new SerializedObject(ScriptableNode);
             var property = nodeSerializedObject.FindProperty(propertyName);
             if (property is null)
             {

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-1167204504504658886
+--- !u!114 &-9022159158038585117
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,34 +9,35 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a55ba0218b7f4a65ac2c0a1f85b50124, type: 3}
-  m_Name: Print
+  m_Script: {fileID: 11500000, guid: fa6b0c6c7add4432b0f0d7fde30f2248, type: 3}
+  m_Name: Value
   m_EditorClassIdentifier: 
-  m_Id: 7cc4ba53-1268-447b-8862-62beeef9da21
+  m_Id: e2e28d30-8ffd-4de9-ac75-4417e0f3f5c4
   m_Position:
     serializedVersion: 2
-    x: 624
-    y: 463
+    x: 373
+    y: 432
     width: 0
     height: 0
   m_DepthLevel: 0
   m_Expanded: 1
-  m_InPorts:
-  - rid: 6174426780411363332
-  m_OutPorts: []
+  m_InPorts: []
+  m_OutPorts:
+  - rid: 6174426783601131613
   Value: 0
+  Input: 0
   references:
     version: 2
     RefIds:
-    - rid: 6174426780411363332
-      type: {class: InPort, ns: GiftHorse.SerializedGraphs, asm: GiftHorse.SerializedGraph}
+    - rid: 6174426783601131613
+      type: {class: OutPort, ns: GiftHorse.ScriptableGraphs, asm: GiftHorse.SerializedGraph}
       data:
         m_Name: Value
-        m_NodeId: 7cc4ba53-1268-447b-8862-62beeef9da21
+        m_NodeId: e2e28d30-8ffd-4de9-ac75-4417e0f3f5c4
         m_Index: 0
         m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-        m_ConnectionId: 
+        m_ConnectionIds: []
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50,8 +51,70 @@ MonoBehaviour:
   m_Name: CalculatorGraph
   m_EditorClassIdentifier: 
   m_Nodes:
-  - {fileID: -1167204504504658886}
-  m_Connections: []
+  - {fileID: 3543953944205234412}
+  - {fileID: -9022159158038585117}
+  m_Connections:
+  - m_Id: 15eb336f-f3dc-4c70-9c62-b82551434f12
+    m_FromPort:
+      rid: 6174426783601131614
+    m_ToPort:
+      rid: 6174426783601131615
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 6174426783601131614
+      type: {class: OutPort, ns: GiftHorse.ScriptableGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Name: Value
+        m_NodeId: e2e28d30-8ffd-4de9-ac75-4417e0f3f5c4
+        m_Index: 0
+        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        m_ConnectionIds:
+        - 15eb336f-f3dc-4c70-9c62-b82551434f12
+    - rid: 6174426783601131615
+      type: {class: InPort, ns: GiftHorse.ScriptableGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Name: Value
+        m_NodeId: bad4d3fc-9bc2-439b-9ad7-4bccc6af5a22
+        m_Index: 0
+        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        m_ConnectionId: 15eb336f-f3dc-4c70-9c62-b82551434f12
+--- !u!114 &3543953944205234412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a55ba0218b7f4a65ac2c0a1f85b50124, type: 3}
+  m_Name: Print
+  m_EditorClassIdentifier: 
+  m_Id: bad4d3fc-9bc2-439b-9ad7-4bccc6af5a22
+  m_Position:
+    serializedVersion: 2
+    x: 539
+    y: 231
+    width: 0
+    height: 0
+  m_DepthLevel: 0
+  m_Expanded: 1
+  m_InPorts:
+  - rid: 6174426783601131612
+  m_OutPorts: []
+  Value: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 6174426783601131612
+      type: {class: InPort, ns: GiftHorse.ScriptableGraphs, asm: GiftHorse.SerializedGraph}
+      data:
+        m_Name: Value
+        m_NodeId: bad4d3fc-9bc2-439b-9ad7-4bccc6af5a22
+        m_Index: 0
+        m_CompatibleType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        m_ConnectionId: 

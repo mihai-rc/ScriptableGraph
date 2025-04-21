@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using UnityEngine;
 
-namespace GiftHorse.SerializedGraphs
+namespace GiftHorse.ScriptableGraphs
 {
     /// <summary>
     /// Data about a connection between two ports. 
@@ -11,7 +11,7 @@ namespace GiftHorse.SerializedGraphs
     [Serializable]
     public class Connection
     {
-        private const string k_FieldsCouldNotBeFound = "[SerializedGraph] The field {0} of the associated port cannot be found!";
+        private const string k_FieldsCouldNotBeFound = "[ScriptableGraph] The field {0} of the associated port cannot be found!";
         
         [SerializeField] private string m_Id;
 
@@ -50,8 +50,8 @@ namespace GiftHorse.SerializedGraphs
         /// <summary>
         /// Initializes the <see cref="Connection"/>.
         /// </summary>
-        /// <param name="nodesById"> Dictionary of the <see cref="ISerializedNode"/>s mapped to their ids. </param>
-        public void Init(Dictionary<string, ISerializedNode> nodesById) => m_TransferValueFn = CreateTransferValueDelegate(nodesById);
+        /// <param name="nodesById"> Dictionary of the <see cref="ScriptableNode"/>s mapped to their ids. </param>
+        public void Init(Dictionary<string, ScriptableNode> nodesById) => m_TransferValueFn = CreateTransferValueDelegate(nodesById);
         
         /// <summary>
         /// Transfers the value from the emitting output field into the receiving input field.
@@ -63,18 +63,18 @@ namespace GiftHorse.SerializedGraphs
         /// corresponding to the connected ports and assigns the output to the input.
         /// </summary>
         /// <param name="nodesById">
-        /// Dictionary of the <see cref="ISerializedNode"/>s mapped to their ids.
+        /// Dictionary of the <see cref="ScriptableNode"/>s mapped to their ids.
         /// </param>
         /// <returns>
         /// A delegate that assigns the input field of the receiving
-        /// <see cref="ISerializedNode"/> to the output field of the emitting <see cref="ISerializedNode"/>.
+        /// <see cref="ScriptableNode"/> to the output field of the emitting <see cref="ScriptableNode"/>.
         /// </returns>
         /// <remarks>
-        /// In order for this to work, the fields of the nodes must be public and the <see cref="ISerializedGraph.Nodes"/>
+        /// In order for this to work, the fields of the nodes must be public and the <see cref="ScriptableGraph.Nodes"/>
         /// should be kept sorted by their Depth Level thus the output field is always assigned before the input field.
         /// TODO: Make sure that this approach works well with Apple policies. If not, change the solution to use code generation to achieve the same result.
         /// </remarks>
-        private Action CreateTransferValueDelegate(Dictionary<string, ISerializedNode> nodesById)
+        private Action CreateTransferValueDelegate(Dictionary<string, ScriptableNode> nodesById)
         {
             var fromNode = nodesById[m_FromPort.NodeId];
             var toNode = nodesById[m_ToPort.NodeId];

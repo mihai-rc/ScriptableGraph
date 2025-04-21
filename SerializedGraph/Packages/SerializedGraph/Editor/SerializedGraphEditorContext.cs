@@ -6,22 +6,22 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace GiftHorse.SerializedGraphs.Editor
+namespace GiftHorse.ScriptableGraphs.Editor
 {
     public class SerializedGraphEditorContext
     {
         /// <summary>
         /// Reference to the graph asset.
         /// </summary>
-        public SerializedGraphBase Graph { get; private set; }
+        public ScriptableGraph Graph { get; private set; }
 
         /// <summary>
-        /// The <see cref="SerializedGraphView"/> that edits the <see cref="SerializedGraphBase"/>.
+        /// The <see cref="SerializedGraphView"/> that edits the <see cref="ScriptableGraph"/>.
         /// </summary>
         public SerializedGraphView GraphView { get; private set; }
 
         /// <summary>
-        /// The serialized object of the <see cref="SerializedGraphBase"/>.
+        /// The serialized object of the <see cref="ScriptableGraph"/>.
         /// </summary>
         public SerializedObject SerializedObject { get; private set; }
 
@@ -42,7 +42,7 @@ namespace GiftHorse.SerializedGraphs.Editor
         /// </summary>
         /// <param name="graph"> Reference to the graph asset. </param>
         /// <param name="window"> The editor window that contains the <see cref="SerializedGraphView"/>. </param>
-        public SerializedGraphEditorContext(SerializedGraphBase graph, SerializedGraphWindow window)
+        public SerializedGraphEditorContext(ScriptableGraph graph, SerializedGraphWindow window)
         {
             Graph = graph;
             Window = window;
@@ -89,7 +89,7 @@ namespace GiftHorse.SerializedGraphs.Editor
 
             // foreach (var item in AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GetAssetPath(Graph)))
             // {
-            //     var node = item as SerializedNodeBase;
+            //     var node = item as ScriptableNode;
             //     if (node != null)
             //     {
             //         if (!Graph.Nodes.Contains(node))

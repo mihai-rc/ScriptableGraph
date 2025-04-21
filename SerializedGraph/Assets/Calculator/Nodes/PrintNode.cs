@@ -1,4 +1,4 @@
-using GiftHorse.SerializedGraphs.Attributes;
+using GiftHorse.ScriptableGraphs.Attributes;
 
 namespace Calculator
 {
@@ -6,12 +6,11 @@ namespace Calculator
     public class PrintNode : CalculatorNode
     {
         [Input] public float Value;
-        // [NodeField] public LoggerProperty LoggerProperty;
 
         protected override void OnProcess()
         {
-            // LoggerProperty.Logger.AddLog($"Node: {Id}, has Depth Level: {DepthLevel}. PRINT: {Value}");
-            // LoggerProperty.Logger.ShowLog();
+            Logger.AddLog($"Node: {Id}, has Depth Level: {DepthLevel}. PRINT: {Value}");
+            Logger.ShowLog();
         }
     }
 }

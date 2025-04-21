@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using GiftHorse.ScriptableGraphs.Attributes;
 using UnityEngine;
-using GiftHorse.SerializedGraphs.Attributes;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace GiftHorse.SerializedGraphs
+namespace GiftHorse.ScriptableGraphs
 {
     public static class ReflectionHelper
     {
         private const BindingFlags k_BindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-        private const string k_NotSubTypeOfSerializedNode = "[SerializedGraph] Cannot process type: {0} because it is not a subtype of SerializedNode!";
+        private const string k_NotSubTypeOfScriptableNode = "[ScriptableGraph] Cannot process type: {0} because it is not a subtype of ScriptableNode!";
 
         /// <summary>
         /// Gets the title of the node based on its type.
@@ -36,7 +36,7 @@ namespace GiftHorse.SerializedGraphs
         /// <param name="node"> The node whose ports are being fetched. </param>
         /// <param name="inPorts"> Out reference of the list containing all the input ports. </param>
         /// <param name="outPorts"> Out reference of the list containing all the output ports. </param>
-        public static void GetNodePorts(ISerializedNode node, out List<InPort> inPorts, out List<OutPort> outPorts)
+        public static void GetNodePorts(ScriptableNode node, out List<InPort> inPorts, out List<OutPort> outPorts)
         {
             inPorts = null;
             outPorts = null;
@@ -60,12 +60,12 @@ namespace GiftHorse.SerializedGraphs
                 .ToList();
         }
 
-        private static bool IsSubclassOfNode(Type type)
+        public static bool IsSubclassOfNode(Type type)
         {
-            if (type.GetInterfaces().Contains(typeof(ISerializedNode))) 
+            if (type.IsSubclassOf(typeof(ScriptableNode))) 
                 return true;
 
-            Debug.LogErrorFormat(k_NotSubTypeOfSerializedNode, type.FullName);
+            Debug.LogErrorFormat(k_NotSubTypeOfScriptableNode, type.FullName);
             return false;
         }
 

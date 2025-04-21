@@ -1,4 +1,4 @@
-using GiftHorse.SerializedGraphs.Attributes;
+using GiftHorse.ScriptableGraphs.Attributes;
 
 namespace Calculator
 {
@@ -9,12 +9,11 @@ namespace Calculator
         [Input] public float Second;
 
         [Output] public float Value;
-        // [NodeField] public LoggerProperty LoggerProperty;
 
         protected override void OnProcess()
         {
             Value = First + Second;
-            // LoggerProperty.Logger.AddLog($"Node: {Id}, has Depth Level: {DepthLevel} and Outputs value: {Value}");
+            Logger.AddLog($"Node: {Id}, has Depth Level: {DepthLevel} and Outputs value: {Value}");
         }
     }
 }

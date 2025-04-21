@@ -1,10 +1,10 @@
-using GiftHorse.SerializedGraphs;
+using GiftHorse.ScriptableGraphs;
 using UnityEngine;
 
 namespace Calculator
 {
     [CreateAssetMenu(fileName = "CalculatorGraph", menuName = "CalculatorGraph")]
-    public class CalculatorGraph : SerializedGraphOf<CalculatorNode>
+    public class CalculatorGraph : ScriptableGraphOf<CalculatorNode>
     {
     }
 }

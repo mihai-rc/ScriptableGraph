@@ -529,6 +529,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1021445980}
+  - component: {fileID: 1021445981}
   m_Layer: 0
   m_Name: _CalculatorGraph
   m_TagString: Untagged
@@ -551,6 +552,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1021445981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021445978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 713e629109fc3cd48baf088522416805, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Logger: {fileID: 279511793}
+  m_Graph: {fileID: 11400000, guid: e5f61f41fddf8724ba668c6311faacd1, type: 2}
+  m_Nodes:
+  - {fileID: -6584542840566294809, guid: e5f61f41fddf8724ba668c6311faacd1, type: 2}
+  - {fileID: 2814183799001068789, guid: e5f61f41fddf8724ba668c6311faacd1, type: 2}
+  - {fileID: 4651744944518684470, guid: e5f61f41fddf8724ba668c6311faacd1, type: 2}
+  - {fileID: -4693530595547512859, guid: e5f61f41fddf8724ba668c6311faacd1, type: 2}
+  - {fileID: 2300019188856940398, guid: e5f61f41fddf8724ba668c6311faacd1, type: 2}
 --- !u!1 &1510563374
 GameObject:
   m_ObjectHideFlags: 0
@@ -794,10 +815,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1021445978}
         m_TargetAssemblyTypeName: GiftHorse.SerializedGraphs.SerializedGraphBase,
           GiftHorse.SerializedGraph
-        m_MethodName: Process
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

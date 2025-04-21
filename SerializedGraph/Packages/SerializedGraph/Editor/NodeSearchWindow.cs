@@ -7,7 +7,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using UnityEngine.Pool;
 
-namespace GiftHorse.SerializedGraphs.Editor
+namespace GiftHorse.ScriptableGraphs.Editor
 {
     /// <summary>
     /// Node search window for creating new nodes in the graph editor.
@@ -26,7 +26,7 @@ namespace GiftHorse.SerializedGraphs.Editor
 
         private SerializedGraphWindow m_Window;
         private SerializedGraphView m_GraphView;
-        private ISerializedGraph m_Graph;
+        private ScriptableGraph m_Graph;
 
         /// <summary>
         /// Initializes the search window with the context of the graph editor.
@@ -65,7 +65,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             if (searchTreeEntry.userData is not Type type)
                 return false;
 
-            if (!TryCreateNode(m_Graph as SerializedGraphBase, type, graphMousePosition, out var node))
+            if (!TryCreateNode(m_Graph as ScriptableGraph, type, graphMousePosition, out var node))
                 return true;
 
             m_GraphView.Add(node);
@@ -148,7 +148,7 @@ namespace GiftHorse.SerializedGraphs.Editor
             return tree;
         }
         
-        public bool TryCreateNode(SerializedGraphBase graph, Type nodeType, Vector2 graphMousePosition, out SerializedNodeBase node)
+        public bool TryCreateNode(ScriptableGraph graph, Type nodeType, Vector2 graphMousePosition, out ScriptableNode node)
         {
             node = null;
             if (graph == null)
@@ -157,14 +157,13 @@ namespace GiftHorse.SerializedGraphs.Editor
                 return false;
             }
 
-            if (!nodeType.IsSubclassOf(typeof(SerializedNodeBase)))
+            if (!ReflectionHelper.IsSubclassOfNode(nodeType))
             {
-                Debug.LogError($"Cannot create a node of type {nodeType.Name} because it does not inherit from SerializedNodeBase.");
                 return false;
             }
 
-            node = ScriptableObject.CreateInstance(nodeType) as SerializedNodeBase;
-            node.Name = ReflectionHelper.GetNodeTitleByType(node.GetType());
+            node = (ScriptableNode)CreateInstance(nodeType);
+            node.name = ReflectionHelper.GetNodeTitleByType(node.GetType());
             node.Position = new Rect(graphMousePosition, new Vector2());
 
             AssetDatabase.AddObjectToAsset(node, graph);

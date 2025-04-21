@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace GiftHorse.SerializedGraphs
+namespace GiftHorse.ScriptableGraphs
 {
     /// <summary>
     /// Data about an output port.
@@ -26,8 +26,8 @@ namespace GiftHorse.SerializedGraphs
         /// <see cref="OutPort"/> constructor.
         /// </summary>
         /// <param name="name"> The name of the port. </param>
-        /// <param name="nodeId"> The id of the <see cref="ISerializedNode"/> this port belongs to. </param>
-        /// <param name="index"> The index of the port in <see cref="ISerializedNode"/>'s output ports list. </param>
+        /// <param name="nodeId"> The id of the <see cref="ScriptableNode"/> this port belongs to. </param>
+        /// <param name="index"> The index of the port in <see cref="ScriptableNode"/>'s output ports list. </param>
         /// <param name="compatibleType"> The assembly qualified name of the type this port is compatible with. </param>
         public OutPort(string name, string nodeId, int index, string compatibleType) 
             : base(name, nodeId, index, compatibleType)
